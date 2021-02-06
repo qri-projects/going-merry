@@ -13,7 +13,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends GmStep<Context,
     private StepResApplier<Context, Res> resApplier;
     private static final ConditionedBeansPool CONDITIONED_BEANS_POOL = HashMapConditionedBeansPool.getInstance();
 
-    public ClassicGmStep(Class<OpHandler<Req, Res>> handlerClass,
+    public ClassicGmStep(Class<? extends OpHandler<Req, Res>> handlerClass,
                          StepConditionGenerator<Condition, Context> conditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier) {
@@ -39,7 +39,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends GmStep<Context,
     }
 
     @Override
-    protected Context applyRes(Context context, Res res) {
-        return resApplier.apply(context, res);
+    protected void applyRes(Context context, Res res) {
+        resApplier.apply(context, res);
     }
 }

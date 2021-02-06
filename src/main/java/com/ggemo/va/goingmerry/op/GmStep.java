@@ -15,7 +15,7 @@ public abstract class GmStep<Context, Condition, Req, Res>
         extends BaseOpStep<Context, Req, Res> implements ApplicationContextAware {
     ApplicationContext applicationContext;
 
-    protected Class<OpHandler<Req, Res>> handlerClazz;
+    protected Class<? extends OpHandler<Req, Res>> handlerClazz;
 
     protected abstract Condition generateCondition(Context context);
 
@@ -57,7 +57,7 @@ public abstract class GmStep<Context, Condition, Req, Res>
         applyRes(context, res);
     }
 
-    private void initConditionedBeans(Class<OpHandler<Req, Res>> handlerClazz) {
+    private void initConditionedBeans(Class<? extends OpHandler<Req, Res>> handlerClazz) {
         String[] beanNames = applicationContext.getBeanNamesForType(handlerClazz);
         for (String beanName : beanNames) {
             OpService opService = applicationContext.findAnnotationOnBean(beanName, OpService.class);
