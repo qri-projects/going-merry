@@ -44,7 +44,6 @@ public abstract class GmStep<Context, Condition, Req, Res>
         throw new RuntimeException("123");
     }
 
-    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
@@ -62,8 +61,8 @@ public abstract class GmStep<Context, Condition, Req, Res>
         String[] beanNames = applicationContext.getBeanNamesForType(handlerClazz);
         for (String beanName : beanNames) {
             OpService opService = applicationContext.findAnnotationOnBean(beanName, OpService.class);
-            if (opService.conditionClass() == null) {
-                // todo
+            if (opService == null) {
+                continue;
             }
             OpConditionWrapper<?> opConditionWrapper = BeanUtils.instantiateClass(opService.conditionClass());
             getConditionedBeansPool().put(handlerClazz, opConditionWrapper.getCondition(),
