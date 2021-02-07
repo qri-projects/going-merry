@@ -7,6 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
 import com.ggemo.va.goingmerry.OpConditionWrapper;
@@ -17,5 +18,8 @@ import com.ggemo.va.goingmerry.OpConditionWrapper;
 @Target({ElementType.TYPE})
 @Inherited
 public @interface OpService {
-    Class<? extends OpConditionWrapper<?>> conditionClass();
+    Class<? extends OpConditionWrapper<?>>[] value() default {};
+
+    @AliasFor("value")
+    Class<? extends OpConditionWrapper<?>>[] conditionClasses() default {};
 }
