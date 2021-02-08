@@ -12,7 +12,7 @@ public abstract class GmStep<Context, Condition, Req, Res>
 
     protected Class<? extends OpHandler<Req, Res>> handlerClazz;
 
-    protected abstract Collection<Condition> generateConditions(Context context);
+    protected abstract Collection<Condition> generateMmConditions(Context context);
 
     protected abstract OpHandler<Req, Res> selectHandler(Collection<Condition> conditions);
 
@@ -20,7 +20,7 @@ public abstract class GmStep<Context, Condition, Req, Res>
 
     @Override
     public void handle(Context context) {
-        Collection<Condition> condition = generateConditions(context);
+        Collection<Condition> condition = generateMmConditions(context);
         Req req = generateReq(context);
         OpHandler<Req, Res> handler = selectHandler(condition);
         Res res = handler.handle(req);

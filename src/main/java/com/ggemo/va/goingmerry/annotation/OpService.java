@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
-import com.ggemo.va.goingmerry.OpConditionWrapper;
+import com.ggemo.va.goingmerry.GgConditionWrapper;
 
 @Component
 @Documented
@@ -18,8 +18,8 @@ import com.ggemo.va.goingmerry.OpConditionWrapper;
 @Target({ElementType.TYPE})
 @Inherited
 public @interface OpService {
-    Class<? extends OpConditionWrapper<?>>[] value() default {};
+    Class<? extends GgConditionWrapper<?>>[] value() default {};
 
     @AliasFor("value")
-    Class<? extends OpConditionWrapper<?>>[] conditionClasses() default {};
+    Class<? extends GgConditionWrapper<?>>[] conditionClasses() default {};
 }

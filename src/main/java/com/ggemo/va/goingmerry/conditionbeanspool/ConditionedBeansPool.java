@@ -10,4 +10,6 @@ public interface ConditionedBeansPool {
     boolean isConstructed(Class<?> clazz);
 
     void setConstructed(Class<?> clazz);
+
+    void registerHandler(String fieldPath, Object fieldValue, OpHandler<?, ?> handler);
 }
