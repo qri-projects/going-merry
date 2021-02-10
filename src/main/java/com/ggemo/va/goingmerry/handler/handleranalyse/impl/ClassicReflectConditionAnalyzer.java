@@ -4,7 +4,17 @@ import java.lang.reflect.Field;
 
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
 
-public class ClassicReflectConditionAnalyzer implements ConditionAnalyzer<ClassicConditionAnalyseResult, Object> {
+public class ClassicReflectConditionAnalyzer implements ConditionAnalyzer<ClassicConditionAnalyseResult> {
+    private static ClassicReflectConditionAnalyzer INSTANCE = null;
+    public static ClassicReflectConditionAnalyzer getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ClassicReflectConditionAnalyzer();
+        }
+        return INSTANCE;
+    }
+
+    private ClassicReflectConditionAnalyzer() { }
+
     @Override
     public ClassicConditionAnalyseResult analyse(Object condition) {
         Class<?> clazz = condition.getClass();

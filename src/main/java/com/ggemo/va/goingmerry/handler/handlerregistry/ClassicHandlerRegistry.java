@@ -1,6 +1,7 @@
-package com.ggemo.va.goingmerry.handler.handlerregister;
+package com.ggemo.va.goingmerry.handler.handlerregistry;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,18 +10,28 @@ import org.springframework.context.ApplicationContext;
 
 import com.ggemo.va.goingmerry.GgConditionWrapper;
 import com.ggemo.va.goingmerry.annotation.OpService;
+import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicReflectConditionAnalyzer;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 
 public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult> {
-    private static final Map<Object, OpHandler<?, ?>> CACHE = new HashMap<>();
     private static final Map<OpHandler<?, ?>, ClassicConditionAnalyseResult> GG_HANDLERS_HOLDER = new HashMap<>();
+    private static final Set<Class<? extends OpHandler<?, ?>>> REGISTERED_SET = new HashSet<>();
 
-    private final ClassicReflectConditionAnalyzer analyzer;
+    private static ClassicHandlerRegistry INSTANCE = null;
 
-    public ClassicHandlerRegistry(
+    public static ClassicHandlerRegistry getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ClassicHandlerRegistry(ClassicReflectConditionAnalyzer.getInstance());
+        }
+        return INSTANCE;
+    }
+
+    private final ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
+
+    private ClassicHandlerRegistry(
             ClassicReflectConditionAnalyzer analyzer) {
         this.analyzer = analyzer;
     }
@@ -36,7 +47,6 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
     @Override
     public OpHandler<?, ?> findHandler(ClassicConditionAnalyseResult mmAnalyseResult) {
-        Set<String> mmFields = mmAnalyseResult.keySet();
         // key: handler, value: 命中的special条件数
         Map<OpHandler<?, ?>, Integer> matchedHandlers = new HashMap<>();
 
@@ -97,6 +107,12 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     @Override
     public void initRegister(Class<? extends OpHandler<?, ?>> handlerClazz) {
         this.innerInitRegister(getApplicationContext(), handlerClazz);
+        REGISTERED_SET.add(handlerClazz);
+    }
+
+    @Override
+    public boolean registered(Class<? extends OpHandler<?, ?>> handlerClazz) {
+        return REGISTERED_SET.contains(handlerClazz);
     }
 
     private void innerInitRegister(ApplicationContext applicationContext,

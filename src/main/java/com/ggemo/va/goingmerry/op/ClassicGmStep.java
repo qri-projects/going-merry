@@ -8,34 +8,44 @@ import org.springframework.context.ApplicationContext;
 
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
+import com.ggemo.va.goingmerry.handler.handlerSelector.ClassicHandlerSelector;
+import com.ggemo.va.goingmerry.handler.handlerSelector.HandlerSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 
-public class ClassicGmStep<Context, Condition, Req, Res> extends GmStep<Context, Condition, Req, Res> {
-    private MmConditionGenerator<Collection<Condition>, Context> mmConditionGenerator;
+public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelectorBasedGmStep<Context, Condition, Req, Res> {
+    private MmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
     private StepResApplier<Context, Res> resApplier;
+    HandlerSelector handlerSelector;
 
-    public ClassicGmStep(Class<? extends OpHandler<Req, Res>> handlerClass,
-                         MmConditionGenerator<Collection<Condition>, Context> mmConditionGenerator,
+    public ClassicGmStep(Class<OpHandler<Req, Res>> handlerClass,
+                         MmConditionGenerator<Condition, Context> mmConditionGenerator,
+                         StepReqGenerator<Req, Context> reqGenerator,
+                         StepResApplier<Context, Res> resApplier,
+                         HandlerSelector handlerSelector) {
+        this.handlerClazz = handlerClass;
+        this.mmConditionGenerator = mmConditionGenerator;
+        this.reqGenerator = reqGenerator;
+        this.resApplier = resApplier;
+        this.handlerSelector = handlerSelector;
+    }
+
+    public ClassicGmStep(Class<OpHandler<Req, Res>> handlerClass,
+                         MmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier) {
         this.handlerClazz = handlerClass;
         this.mmConditionGenerator = mmConditionGenerator;
         this.reqGenerator = reqGenerator;
         this.resApplier = resApplier;
+        this.handlerSelector = ClassicHandlerSelector.getInstance();
     }
 
-
     @Override
-    protected Collection<Condition> generateMmConditions(Context context) {
+    protected Condition generateMmCondition(Context context) {
         return mmConditionGenerator.gen(context);
-    }
-
-    @Override
-    protected OpHandler<Req, Res> selectHandler(Collection<Condition> mmConditions) {
-        throw new RuntimeException("123");
     }
 
     @Override
@@ -53,7 +63,12 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends GmStep<Context,
         resApplier.apply(context, res);
     }
 
-    private void initConditionedBeans(Class<? extends OpHandler<Req, Res>> handlerClazz) throws IllegalAccessException {
+    private void initConditionedBeans(Class<? extends OpHandler<Req, Res>> handlerClazz) {
 
+    }
+
+    @Override
+    public HandlerSelector getHandlerSelector() {
+        return ClassicHandlerSelector.getInstance();
     }
 }
