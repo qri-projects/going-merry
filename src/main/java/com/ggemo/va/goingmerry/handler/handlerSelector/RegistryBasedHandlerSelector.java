@@ -13,7 +13,8 @@ public abstract class RegistryBasedHandlerSelector<AnalyseResult extends Conditi
     protected abstract ConditionAnalyzer<AnalyseResult> getConditionAnalyzer();
 
     protected AnalyseResult analyseCondition(Object condition) {
-        return getConditionAnalyzer().analyse(condition);
+//        return getConditionAnalyzer().analyse(condition);
+        return null;
     }
 
     protected OpHandler<?, ?> selectWithOutCache

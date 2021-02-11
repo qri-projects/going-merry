@@ -1,5 +1,6 @@
 package com.ggemo.va.goingmerry.handler.handlerregistry;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,11 +45,13 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
     @Override
     public void register(ClassicConditionAnalyseResult analyseResult, OpHandler<?, ?> handler) {
-        Class<? extends OpHandler> handlerClazz = handler.getClass();
-        if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
-            GG_HANDLERS_HOLDER.put(handlerClazz, new HashMap<>());
+
+        for (Class handlerClazz : getHandlerSuperClasses(handler.getClass())) {
+            if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
+                GG_HANDLERS_HOLDER.put(handlerClazz, new HashMap<>());
+            }
+            GG_HANDLERS_HOLDER.get(handlerClazz).put(handler, analyseResult);
         }
-        GG_HANDLERS_HOLDER.get(handlerClazz).put(handler, analyseResult);
     }
 
     @Override
@@ -140,10 +143,38 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
                 GgConditionWrapper<?> ggConditionWrapper = BeanUtils.instantiateClass(wrapperClazz);
                 Object ggCondition = ggConditionWrapper.getGgCondition();
 
-                ClassicConditionAnalyseResult result = analyzer.analyse(ggCondition);
+                ClassicConditionAnalyseResult result = analyzer.analyse(ggCondition, handlerClazz);
 
                 register(result, applicationContext.getBean(beanName, handlerClazz));
             }
         }
+    }
+
+    private static Set<Class> getInterfacesAndSuperClass(Class clazz) {
+        Set<Class> set = new HashSet<>();
+        set.addAll(Arrays.asList(clazz.getInterfaces()));
+        set.add(clazz.getSuperclass());
+        return set;
+    }
+
+    private static Set<Class> getHandlerSuperClasses(Class clazz) {
+        if (clazz == null) {
+            return new HashSet<>();
+        }
+        if (clazz.equals(OpHandler.class)) {
+            return new HashSet<Class>(){{add(OpHandler.class);}};
+        }
+        Set<Class> res = new HashSet<>();
+        for (Class interfaze : getInterfacesAndSuperClass(clazz)) {
+            Set<Class> interfazeRes = getHandlerSuperClasses(interfaze);
+            if (interfazeRes.size() == 0) {
+                continue;
+            }
+            res.addAll(getHandlerSuperClasses(interfaze));
+        }
+        if (res.size() != 0) {
+            res.add(clazz);
+        }
+        return res;
     }
 }

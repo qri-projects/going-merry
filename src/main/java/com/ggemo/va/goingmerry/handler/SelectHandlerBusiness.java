@@ -17,12 +17,24 @@ public class SelectHandlerBusiness
         extends RichListPplBusiness<SelectHandlerBusiness.Context<ClassicConditionAnalyseResult>,
         SelectHandlerBusiness.Req, OpHandler<?, ?>>
         implements HandlerSelector {
+    private static SelectHandlerBusiness INSTANCE;
 
-    public SelectHandlerBusiness() {
+    public static SelectHandlerBusiness getInstance() {
+        if (INSTANCE != null) {
+            return INSTANCE;
+        }
+        INSTANCE = new SelectHandlerBusiness();
+        return INSTANCE;
+    }
+
+    private SelectHandlerBusiness() {
         // init cacheUtil
         CacheStepUtil<SelectHandlerBusiness.Context<ClassicConditionAnalyseResult>, Object, OpHandler<?, ?>>
                 cacheStepUtil =
                 new CacheStepUtil<>(Context::getMmCondition, Context::getResHandler, (c, res) -> {
+                    if (res == null) {
+                        return;
+                    }
                     c.setResHandler(res);
                     c.setEarlyReturn(true);
                 });
@@ -42,7 +54,7 @@ public class SelectHandlerBusiness
         ));
 
         // find handler in registry
-        addStep(new ClassicOpStep<>(ClassicFindHandlerInRegistryHandler.Companion.getInstance(), c -> c,
+        addStep(new ClassicOpStep<>(ClassicFindHandlerInRegistryHandler.getInstance(), c -> c,
                 Context::setResHandler));
 
         // fill into cache
