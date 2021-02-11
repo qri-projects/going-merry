@@ -1,6 +1,6 @@
-package com.ggemo.va.goingmerry.handler.handlerregistry;
+package com.ggemo.va.goingmerry.handlerselector.handlerregistry;
 
-import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyseResult;
 import com.ggemo.va.handler.OpHandler;
 
 public interface HandlerRegistry<AnalyseResult extends ConditionAnalyseResult> {

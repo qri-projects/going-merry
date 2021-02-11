@@ -1,20 +1,24 @@
-package com.ggemo.va.goingmerry.handler.handleranalyse.impl;
+package com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
-import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.handler.OpHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * <p>{@link ConditionAnalyzer}的classic实现
+ *
+ * <p>将condition解析为一个map
+ */
 public class ClassicConditionAnalyzer
         implements OpHandler<ClassicConditionAnalyzer.Req, ClassicConditionAnalyseResult>,
         ConditionAnalyzer<ClassicConditionAnalyseResult> {
-    public static final String FIELD_PREFIX = "#";
-    public static final String DEFAULT_FIELD = "#value";
+    public static final String DEFAULT_FIELD = "value";
 
     private static final ClassicConditionAnalyzer INSTANCE = new ClassicConditionAnalyzer();
     public static ClassicConditionAnalyzer getInstance() {
@@ -25,17 +29,15 @@ public class ClassicConditionAnalyzer
     @Override
     public ClassicConditionAnalyseResult handle(Req req) {
         Object condition = req.getCondition();
+        ClassicConditionAnalyseResult result = new ClassicConditionAnalyseResult();
+
         if (condition == null) {
-            ClassicConditionAnalyseResult result = new ClassicConditionAnalyseResult();
             result.put(DEFAULT_FIELD, null);
             return result;
         }
 
-        ClassicConditionAnalyseResult result = new ClassicConditionAnalyseResult();
-        result.setHandlerClazz(req.getHandlerClazz());
-
         // 枚举值
-        if (condition instanceof Enum<?>) {
+        if (condition instanceof Enum) {
             result.put(DEFAULT_FIELD, condition);
             return result;
         }
@@ -43,13 +45,12 @@ public class ClassicConditionAnalyzer
         // map
         if (condition instanceof Map) {
             Map<?, ?> conditionMap = (Map<?, ?>) condition;
-            conditionMap.forEach((field, value) -> {
-                result.put(FIELD_PREFIX + field, value);
-            });
+            conditionMap.forEach((field, value) -> result.put(field.toString(), value));
             result.putAll(conditionMap);
             return result;
         }
 
+        // todo: 不完善
         // list set等collection
         if (condition instanceof Collection) {
             Collection<Object> conditionCollection = (Collection<Object>) condition;

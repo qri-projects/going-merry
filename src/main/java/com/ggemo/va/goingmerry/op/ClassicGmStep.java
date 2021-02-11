@@ -4,8 +4,8 @@ import org.springframework.context.ApplicationContext;
 
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
-import com.ggemo.va.goingmerry.handler.handlerSelector.impl.ClassicHandlerSelector;
-import com.ggemo.va.goingmerry.handler.handlerSelector.HandlerSelector;
+import com.ggemo.va.goingmerry.handlerselector.impl.ClassicHandlerSelector;
+import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;

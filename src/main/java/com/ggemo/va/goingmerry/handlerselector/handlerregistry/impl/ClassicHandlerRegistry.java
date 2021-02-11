@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.handler.handlerregistry.impl;
+package com.ggemo.va.goingmerry.handlerselector.handlerregistry.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,11 +11,11 @@ import org.springframework.context.ApplicationContext;
 
 import com.ggemo.va.goingmerry.GgConditionWrapper;
 import com.ggemo.va.goingmerry.annotation.OpService;
-import com.ggemo.va.goingmerry.handler.handlerSelector.impl.ClassicHandlerSelector;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyzer;
-import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
-import com.ggemo.va.goingmerry.handler.handlerregistry.HandlerRegistry;
+import com.ggemo.va.goingmerry.handlerselector.impl.ClassicHandlerSelector;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 

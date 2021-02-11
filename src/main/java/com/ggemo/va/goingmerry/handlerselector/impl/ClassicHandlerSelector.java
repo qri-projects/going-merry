@@ -1,11 +1,11 @@
-package com.ggemo.va.goingmerry.handler.handlerSelector.impl;
+package com.ggemo.va.goingmerry.handlerselector.impl;
 
 import com.ggemo.va.business.pipeline.RichListPplBusiness;
-import com.ggemo.va.goingmerry.handler.handlerSelector.HandlerSelector;
-import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyseResult;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyzer;
-import com.ggemo.va.goingmerry.handler.handlerregistry.impl.ClassicHandlerRegistry;
+import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
+import com.ggemo.va.goingmerry.handlerselector.handlerregistry.impl.ClassicHandlerRegistry;
 import com.ggemo.va.handler.OpHandler;
 import com.ggemo.va.opentity.OpRichContext;
 import com.ggemo.va.step.ClassicOpStep;
@@ -14,6 +14,11 @@ import com.ggemo.va.step.useutils.CacheStepUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * <p>根据条件找实现类, {@link HandlerSelector}的classic实现
+ *
+ * <p>具体实现逻辑见{@link ClassicHandlerSelector#ClassicHandlerSelector()}
+ */
 public class ClassicHandlerSelector
         extends RichListPplBusiness<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>,
         ClassicHandlerSelector.Req, OpHandler<?, ?>>
@@ -29,7 +34,8 @@ public class ClassicHandlerSelector
     }
 
     private ClassicHandlerSelector() {
-        // init cacheUtil
+        // 初始化缓存工具, 方便从缓存取结果
+        // 一个condition如果没有缓存的话, 要经过下面那些步骤(解析condition, 匹配解析结果等)才能拿到实现类
         CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, Object, OpHandler<?, ?>>
                 cacheStepUtil =
                 new CacheStepUtil<>(Context::getMmCondition, Context::getResHandler, (c, res) -> {
@@ -40,20 +46,24 @@ public class ClassicHandlerSelector
                     c.setEarlyReturn(true);
                 });
 
-        // find in cache
+        // 从缓存中取值
         addStep(cacheStepUtil.getGetStep());
 
-        // analyse condition
-        addStep(new ClassicOpStep<>(ClassicConditionAnalyzer.getInstance(),
+        // 对条件对象condition进行解析
+        addStep(new ClassicOpStep<>(
+                ClassicConditionAnalyzer.getInstance(),
                 c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getHandlerClazz()),
                 Context::setAnalyseResult
         ));
 
-        // find handler in registry
-        addStep(new ClassicOpStep<>(ClassicHandlerRegistry.getInstance(), c -> c,
-                Context::setResHandler));
+        // 根据解析结果找到匹配的OpHandler
+        addStep(new ClassicOpStep<>(
+                ClassicHandlerRegistry.getInstance(),
+                c -> c,
+                Context::setResHandler
+        ));
 
-        // fill into cache
+        // 写入缓存
         addStep(cacheStepUtil.getPutStep());
     }
 
