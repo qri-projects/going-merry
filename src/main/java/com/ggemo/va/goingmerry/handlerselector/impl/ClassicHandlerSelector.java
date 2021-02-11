@@ -36,15 +36,19 @@ public class ClassicHandlerSelector
     private ClassicHandlerSelector() {
         // 初始化缓存工具, 方便从缓存取结果
         // 一个condition如果没有缓存的话, 要经过下面那些步骤(解析condition, 匹配解析结果等)才能拿到实现类
-        CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, Object, OpHandler<?, ?>>
+        CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, ClassicConditionAnalyzer.Req,
+                OpHandler<?, ?>>
                 cacheStepUtil =
-                new CacheStepUtil<>(Context::getMmCondition, Context::getResHandler, (c, res) -> {
-                    if (res == null) {
-                        return;
-                    }
-                    c.setResHandler(res);
-                    c.setEarlyReturn(true);
-                });
+                new CacheStepUtil<>(
+                        c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getMmHandlerClazz()),
+                        Context::getResHandler,
+                        (c, res) -> {
+                            if (res == null) {
+                                return;
+                            }
+                            c.setResHandler(res);
+                            c.setEarlyReturn(true);
+                        });
 
         // 从缓存中取值
         addStep(cacheStepUtil.getGetStep());
@@ -52,14 +56,14 @@ public class ClassicHandlerSelector
         // 对条件对象condition进行解析
         addStep(new ClassicOpStep<>(
                 ClassicConditionAnalyzer.getInstance(),
-                c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getHandlerClazz()),
+                c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getMmHandlerClazz()),
                 Context::setAnalyseResult
         ));
 
         // 根据解析结果找到匹配的OpHandler
         addStep(new ClassicOpStep<>(
                 ClassicHandlerRegistry.getInstance(),
-                c -> c,
+                c -> new ClassicHandlerRegistry.Req(c.getMmHandlerClazz(), c.getAnalyseResult()),
                 Context::setResHandler
         ));
 
@@ -70,7 +74,7 @@ public class ClassicHandlerSelector
     @Override
     protected Context<ClassicConditionAnalyseResult> generateContext(Req req) {
         Context<ClassicConditionAnalyseResult> context = new Context<>();
-        context.setHandlerClazz(req.getHandlerClazz());
+        context.setMmHandlerClazz(req.getHandlerClazz());
         context.setMmCondition(req.getMmCondition());
         return context;
     }
@@ -91,11 +95,12 @@ public class ClassicHandlerSelector
     @Data
     @NoArgsConstructor
     public static class Context<AnalyseResult extends ConditionAnalyseResult> implements OpRichContext {
-        Class<? extends OpHandler<?, ?>> handlerClazz;
-        OpHandler<?, ?> resHandler;
-
+        Class<? extends OpHandler<?, ?>> mmHandlerClazz;
         Object mmCondition;
+
         AnalyseResult analyseResult;
+
+        OpHandler<?, ?> resHandler;
 
         boolean earlyReturn = false;
 

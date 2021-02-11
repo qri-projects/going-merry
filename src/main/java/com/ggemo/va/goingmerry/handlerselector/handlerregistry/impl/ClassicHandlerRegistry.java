@@ -19,24 +19,29 @@ import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 
-public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>, OpHandler<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, OpHandler<?, ?>> {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>,
+        OpHandler<ClassicHandlerRegistry.Req, OpHandler<?, ?>> {
     private static final Map<Class<? extends OpHandler>,
             Map<OpHandler<?, ?>, ClassicConditionAnalyseResult>> GG_HANDLERS_HOLDER = new HashMap<>();
+
     private static final Set<Class<? extends OpHandler<?, ?>>> REGISTERED_SET = new HashSet<>();
 
     private static ClassicHandlerRegistry INSTANCE = null;
 
     public static ClassicHandlerRegistry getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new ClassicHandlerRegistry(ClassicConditionAnalyzer.getInstance());
+            INSTANCE = new ClassicHandlerRegistry();
         }
         return INSTANCE;
     }
 
     private final ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
 
-    private ClassicHandlerRegistry(ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer) {
-        this.analyzer = analyzer;
+    private ClassicHandlerRegistry() {
+        this.analyzer = ClassicConditionAnalyzer.getInstance();
     }
 
     private ApplicationContext getApplicationContext() {
@@ -125,11 +130,6 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
         REGISTERED_SET.add(handlerClazz);
     }
 
-    @Override
-    public boolean registered(Class<? extends OpHandler<?, ?>> handlerClazz) {
-        return REGISTERED_SET.contains(handlerClazz);
-    }
-
     private void innerInitRegister(ApplicationContext applicationContext,
                                    Class<? extends OpHandler<?, ?>> handlerClazz) {
 
@@ -150,6 +150,11 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
         }
     }
 
+    @Override
+    public boolean registered(Class<? extends OpHandler<?, ?>> handlerClazz) {
+        return REGISTERED_SET.contains(handlerClazz);
+    }
+
     private static Set<Class> getInterfacesAndSuperClass(Class clazz) {
         Set<Class> set = new HashSet<>();
         set.addAll(Arrays.asList(clazz.getInterfaces()));
@@ -162,7 +167,9 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
             return new HashSet<>();
         }
         if (clazz.equals(OpHandler.class)) {
-            return new HashSet<Class>(){{add(OpHandler.class);}};
+            return new HashSet<Class>() {{
+                add(OpHandler.class);
+            }};
         }
         Set<Class> res = new HashSet<>();
         for (Class interfaze : getInterfacesAndSuperClass(clazz)) {
@@ -179,11 +186,17 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     }
 
     @Override
-    public OpHandler<?, ?> handle(
-            ClassicHandlerSelector.Context<ClassicConditionAnalyseResult> req) {
-        if (!this.registered(req.getHandlerClazz())) {
-            this.initRegister(req.getHandlerClazz());
+    public OpHandler<?, ?> handle(Req req) {
+        if (!this.registered(req.getMmHandlerClazz())) {
+            this.initRegister(req.getMmHandlerClazz());
         }
-        return this.findHandler(req.getAnalyseResult(), req.getHandlerClazz());
+        return this.findHandler(req.getAnalyseResult(), req.getMmHandlerClazz());
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class Req {
+        Class<? extends OpHandler<?, ?>> mmHandlerClazz;
+        ClassicConditionAnalyseResult analyseResult;
     }
 }
