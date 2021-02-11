@@ -1,10 +1,11 @@
-package com.ggemo.va.goingmerry.handler;
+package com.ggemo.va.goingmerry.handler.handlerSelector.impl;
 
-import com.ggemo.va.business.pipeline.ListPplBusiness;
 import com.ggemo.va.business.pipeline.RichListPplBusiness;
 import com.ggemo.va.goingmerry.handler.handlerSelector.HandlerSelector;
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyzer;
+import com.ggemo.va.goingmerry.handler.handlerregistry.impl.ClassicHandlerRegistry;
 import com.ggemo.va.handler.OpHandler;
 import com.ggemo.va.opentity.OpRichContext;
 import com.ggemo.va.step.ClassicOpStep;
@@ -13,23 +14,23 @@ import com.ggemo.va.step.useutils.CacheStepUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class SelectHandlerBusiness
-        extends RichListPplBusiness<SelectHandlerBusiness.Context<ClassicConditionAnalyseResult>,
-        SelectHandlerBusiness.Req, OpHandler<?, ?>>
+public class ClassicHandlerSelector
+        extends RichListPplBusiness<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>,
+        ClassicHandlerSelector.Req, OpHandler<?, ?>>
         implements HandlerSelector {
-    private static SelectHandlerBusiness INSTANCE;
+    private static ClassicHandlerSelector INSTANCE;
 
-    public static SelectHandlerBusiness getInstance() {
+    public static ClassicHandlerSelector getInstance() {
         if (INSTANCE != null) {
             return INSTANCE;
         }
-        INSTANCE = new SelectHandlerBusiness();
+        INSTANCE = new ClassicHandlerSelector();
         return INSTANCE;
     }
 
-    private SelectHandlerBusiness() {
+    private ClassicHandlerSelector() {
         // init cacheUtil
-        CacheStepUtil<SelectHandlerBusiness.Context<ClassicConditionAnalyseResult>, Object, OpHandler<?, ?>>
+        CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, Object, OpHandler<?, ?>>
                 cacheStepUtil =
                 new CacheStepUtil<>(Context::getMmCondition, Context::getResHandler, (c, res) -> {
                     if (res == null) {
@@ -43,18 +44,13 @@ public class SelectHandlerBusiness
         addStep(cacheStepUtil.getGetStep());
 
         // analyse condition
-        addStep(new ClassicOpStep<>(ClassicAnalyseConditionHandler.getInstance(),
-                c -> {
-                    ClassicAnalyseConditionHandler.Req req = new ClassicAnalyseConditionHandler.Req();
-                    req.setCondition(c.getMmCondition());
-                    req.setHandlerClazz(c.getHandlerClazz());
-                    return req;
-                },
+        addStep(new ClassicOpStep<>(ClassicConditionAnalyzer.getInstance(),
+                c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getHandlerClazz()),
                 Context::setAnalyseResult
         ));
 
         // find handler in registry
-        addStep(new ClassicOpStep<>(ClassicFindHandlerInRegistryHandler.getInstance(), c -> c,
+        addStep(new ClassicOpStep<>(ClassicHandlerRegistry.getInstance(), c -> c,
                 Context::setResHandler));
 
         // fill into cache

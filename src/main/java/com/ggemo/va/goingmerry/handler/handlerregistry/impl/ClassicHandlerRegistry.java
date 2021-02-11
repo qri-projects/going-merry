@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.handler.handlerregistry;
+package com.ggemo.va.goingmerry.handler.handlerregistry.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,14 +11,15 @@ import org.springframework.context.ApplicationContext;
 
 import com.ggemo.va.goingmerry.GgConditionWrapper;
 import com.ggemo.va.goingmerry.annotation.OpService;
+import com.ggemo.va.goingmerry.handler.handlerSelector.impl.ClassicHandlerSelector;
+import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyzer;
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicReflectConditionAnalyzer;
+import com.ggemo.va.goingmerry.handler.handlerregistry.HandlerRegistry;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 
-public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult> {
-//    private static final Map<OpHandler<?, ?>, ClassicConditionAnalyseResult> GG_HANDLERS_HOLDER = new HashMap<>();
+public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>, OpHandler<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, OpHandler<?, ?>> {
     private static final Map<Class<? extends OpHandler>,
             Map<OpHandler<?, ?>, ClassicConditionAnalyseResult>> GG_HANDLERS_HOLDER = new HashMap<>();
     private static final Set<Class<? extends OpHandler<?, ?>>> REGISTERED_SET = new HashSet<>();
@@ -27,15 +28,14 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
     public static ClassicHandlerRegistry getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new ClassicHandlerRegistry(ClassicReflectConditionAnalyzer.getInstance());
+            INSTANCE = new ClassicHandlerRegistry(ClassicConditionAnalyzer.getInstance());
         }
         return INSTANCE;
     }
 
     private final ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
 
-    private ClassicHandlerRegistry(
-            ClassicReflectConditionAnalyzer analyzer) {
+    private ClassicHandlerRegistry(ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer) {
         this.analyzer = analyzer;
     }
 
@@ -176,5 +176,14 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
             res.add(clazz);
         }
         return res;
+    }
+
+    @Override
+    public OpHandler<?, ?> handle(
+            ClassicHandlerSelector.Context<ClassicConditionAnalyseResult> req) {
+        if (!this.registered(req.getHandlerClazz())) {
+            this.initRegister(req.getHandlerClazz());
+        }
+        return this.findHandler(req.getAnalyseResult(), req.getHandlerClazz());
     }
 }

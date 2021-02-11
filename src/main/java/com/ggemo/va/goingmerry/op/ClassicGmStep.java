@@ -1,15 +1,10 @@
 package com.ggemo.va.goingmerry.op;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
 
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
-import com.ggemo.va.goingmerry.handler.SelectHandlerBusiness;
-import com.ggemo.va.goingmerry.handler.handlerSelector.ClassicHandlerSelector;
+import com.ggemo.va.goingmerry.handler.handlerSelector.impl.ClassicHandlerSelector;
 import com.ggemo.va.goingmerry.handler.handlerSelector.HandlerSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
@@ -41,7 +36,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
         this.mmConditionGenerator = mmConditionGenerator;
         this.reqGenerator = reqGenerator;
         this.resApplier = resApplier;
-        this.handlerSelector = SelectHandlerBusiness.getInstance();
+        this.handlerSelector = ClassicHandlerSelector.getInstance();
     }
 
     @Override

@@ -1,22 +1,23 @@
-package com.ggemo.va.goingmerry.handler;
+package com.ggemo.va.goingmerry.handler.handleranalyse.impl;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
-import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicReflectConditionAnalyzer;
 import com.ggemo.va.handler.OpHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public class ClassicAnalyseConditionHandler
-        implements OpHandler<ClassicAnalyseConditionHandler.Req, ClassicConditionAnalyseResult>,
+public class ClassicConditionAnalyzer
+        implements OpHandler<ClassicConditionAnalyzer.Req, ClassicConditionAnalyseResult>,
         ConditionAnalyzer<ClassicConditionAnalyseResult> {
-    private static final ClassicAnalyseConditionHandler INSTANCE = new ClassicAnalyseConditionHandler();
-    public static ClassicAnalyseConditionHandler getInstance() {
+    public static final String FIELD_PREFIX = "#";
+    public static final String DEFAULT_FIELD = "#value";
+
+    private static final ClassicConditionAnalyzer INSTANCE = new ClassicConditionAnalyzer();
+    public static ClassicConditionAnalyzer getInstance() {
         return INSTANCE;
     }
 
@@ -26,7 +27,7 @@ public class ClassicAnalyseConditionHandler
         Object condition = req.getCondition();
         if (condition == null) {
             ClassicConditionAnalyseResult result = new ClassicConditionAnalyseResult();
-            result.put(ClassicReflectConditionAnalyzer.DEFAULT_FIELD, null);
+            result.put(DEFAULT_FIELD, null);
             return result;
         }
 
@@ -35,7 +36,7 @@ public class ClassicAnalyseConditionHandler
 
         // 枚举值
         if (condition instanceof Enum<?>) {
-            result.put(ClassicReflectConditionAnalyzer.DEFAULT_FIELD, condition);
+            result.put(DEFAULT_FIELD, condition);
             return result;
         }
 
@@ -43,7 +44,7 @@ public class ClassicAnalyseConditionHandler
         if (condition instanceof Map) {
             Map<?, ?> conditionMap = (Map<?, ?>) condition;
             conditionMap.forEach((field, value) -> {
-                result.put(ClassicReflectConditionAnalyzer.FIELD_PREFIX + field, value);
+                result.put(FIELD_PREFIX + field, value);
             });
             result.putAll(conditionMap);
             return result;
@@ -80,7 +81,7 @@ public class ClassicAnalyseConditionHandler
 
     @Data
     @AllArgsConstructor
-    static class Req {
+    public static class Req {
         Object condition;
         Class<? extends OpHandler<?, ?>> handlerClazz;
     }
