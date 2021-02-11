@@ -10,7 +10,7 @@ public abstract class HandlerSelectorBasedGmStep<Context, Condition, Req, Res>
     public abstract HandlerSelector getHandlerSelector();
 
     @Override
-    protected OpHandler<Req, Res> selectHandler(Class<OpHandler<Req, Res>> handlerClazz, Condition condition) {
-        return (OpHandler<Req, Res>) getHandlerSelector().select(handlerClazz, condition);
+    protected <H extends OpHandler<Req, Res>> H selectHandler(Class<H> handlerClazz, Condition condition) {
+        return (H) getHandlerSelector().select(handlerClazz, condition);
     }
 }

@@ -1,8 +1,5 @@
 package com.ggemo.va.goingmerry.handler.handlerSelector;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handler.handlerregistry.HandlerRegistry;
@@ -19,11 +16,11 @@ public abstract class RegistryBasedHandlerSelector<AnalyseResult extends Conditi
         return getConditionAnalyzer().analyse(condition);
     }
 
-    @Override
-    public OpHandler<?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition) {
+    protected OpHandler<?, ?> selectWithOutCache
+            (Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition) {
         if (!getHandlerRegistry().registered(handlerClazz)) {
             getHandlerRegistry().initRegister(handlerClazz);
         }
-        return getHandlerRegistry().findHandler(analyseCondition(mmCondition));
+        return getHandlerRegistry().findHandler(analyseCondition(mmCondition), handlerClazz);
     }
 }

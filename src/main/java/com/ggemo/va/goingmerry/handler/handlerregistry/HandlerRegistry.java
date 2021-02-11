@@ -6,7 +6,7 @@ import com.ggemo.va.handler.OpHandler;
 public interface HandlerRegistry<AnalyseResult extends ConditionAnalyseResult> {
     void register(AnalyseResult analyseResult, OpHandler<?, ?> handler);
 
-    OpHandler<?, ?> findHandler(AnalyseResult analyseResult);
+    OpHandler<?, ?> findHandler(AnalyseResult analyseResult, Class<? extends OpHandler<?, ?>> handlerClazz);
 
     void initRegister(Class<? extends OpHandler<?, ?>> handlerClazz);
 

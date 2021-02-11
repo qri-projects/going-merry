@@ -17,7 +17,9 @@ import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 
 public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult> {
-    private static final Map<OpHandler<?, ?>, ClassicConditionAnalyseResult> GG_HANDLERS_HOLDER = new HashMap<>();
+//    private static final Map<OpHandler<?, ?>, ClassicConditionAnalyseResult> GG_HANDLERS_HOLDER = new HashMap<>();
+    private static final Map<Class<? extends OpHandler>,
+            Map<OpHandler<?, ?>, ClassicConditionAnalyseResult>> GG_HANDLERS_HOLDER = new HashMap<>();
     private static final Set<Class<? extends OpHandler<?, ?>>> REGISTERED_SET = new HashSet<>();
 
     private static ClassicHandlerRegistry INSTANCE = null;
@@ -42,16 +44,26 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
     @Override
     public void register(ClassicConditionAnalyseResult analyseResult, OpHandler<?, ?> handler) {
-        GG_HANDLERS_HOLDER.put(handler, analyseResult);
+        Class<? extends OpHandler> handlerClazz = handler.getClass();
+        if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
+            GG_HANDLERS_HOLDER.put(handlerClazz, new HashMap<>());
+        }
+        GG_HANDLERS_HOLDER.get(handlerClazz).put(handler, analyseResult);
     }
 
     @Override
-    public OpHandler<?, ?> findHandler(ClassicConditionAnalyseResult mmAnalyseResult) {
+    public OpHandler<?, ?> findHandler(ClassicConditionAnalyseResult mmAnalyseResult,
+                                       Class<? extends OpHandler<?, ?>> handlerClazz) {
         // key: handler, value: 命中的special条件数
         Map<OpHandler<?, ?>, Integer> matchedHandlers = new HashMap<>();
 
+        if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
+            // todo: no handler matches
+            return null;
+        }
+
         // 遍历handler和它的ggAnalyseResult
-        GG_HANDLERS_HOLDER.forEach((handler, ggAnalyseResult) ->
+        GG_HANDLERS_HOLDER.get(handlerClazz).forEach((handler, ggAnalyseResult) ->
 
                 // 遍历mmAnalyseResult各个条件, 判断ggAnalyseResult是否匹配
                 mmAnalyseResult.forEach((field, mmValue) -> {

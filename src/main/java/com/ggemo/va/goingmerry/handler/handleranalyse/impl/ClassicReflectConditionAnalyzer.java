@@ -22,6 +22,12 @@ public class ClassicReflectConditionAnalyzer implements ConditionAnalyzer<Classi
         Field[] fields = clazz.getDeclaredFields();
         ClassicConditionAnalyseResult result = new ClassicConditionAnalyseResult();
 
+        if(condition instanceof Enum) {
+            String fieldName = className + "#" + "value";
+            result.put(fieldName, condition);
+            return result;
+        }
+
         for (Field field : fields) {
             String fieldName = className + "#" + field.getName();
             try {

@@ -18,9 +18,9 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
     private MmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
     private StepResApplier<Context, Res> resApplier;
-    HandlerSelector handlerSelector;
+    private HandlerSelector handlerSelector;
 
-    public ClassicGmStep(Class<OpHandler<Req, Res>> handlerClass,
+    public ClassicGmStep(Class<? extends OpHandler<Req, Res>> handlerClass,
                          MmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier,
@@ -32,7 +32,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
         this.handlerSelector = handlerSelector;
     }
 
-    public ClassicGmStep(Class<OpHandler<Req, Res>> handlerClass,
+    public ClassicGmStep(Class<? extends OpHandler<Req, Res>> handlerClass,
                          MmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier) {
@@ -63,12 +63,8 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
         resApplier.apply(context, res);
     }
 
-    private void initConditionedBeans(Class<? extends OpHandler<Req, Res>> handlerClazz) {
-
-    }
-
     @Override
     public HandlerSelector getHandlerSelector() {
-        return ClassicHandlerSelector.getInstance();
+        return handlerSelector;
     }
 }

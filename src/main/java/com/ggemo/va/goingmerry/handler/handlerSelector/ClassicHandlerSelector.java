@@ -3,7 +3,6 @@ package com.ggemo.va.goingmerry.handler.handlerSelector;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handler.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handler.handleranalyse.impl.ClassicReflectConditionAnalyzer;
@@ -47,7 +46,7 @@ public class ClassicHandlerSelector
                 return inCacheHandler;
             }
         }
-        OpHandler<?, ?> handler = super.select(handlerClazz, mmCondition);
+        OpHandler<?, ?> handler = selectWithOutCache(handlerClazz, mmCondition);
         CACHE.put(mmCondition, handler);
         return handler;
     }
