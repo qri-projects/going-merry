@@ -9,8 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * String: like "package.path.ClassName#fieldName"<br/>
- * Object: field value
+ * <p>AnalyseResult的Classic实现, 其实就是个Map
  */
 @Getter
 @Setter

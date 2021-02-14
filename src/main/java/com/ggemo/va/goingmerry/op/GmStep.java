@@ -5,6 +5,9 @@ import org.springframework.context.ApplicationContext;
 import com.ggemo.va.handler.OpHandler;
 import com.ggemo.va.step.BaseOpStep;
 
+/**
+ * <p>GmStep相关设计见docs/gm-step-design.md
+ */
 public abstract class GmStep<Context, Condition, Req, Res>
         extends BaseOpStep<Context, Req, Res> {
 
@@ -13,8 +16,6 @@ public abstract class GmStep<Context, Condition, Req, Res>
     protected abstract Condition generateMmCondition(Context context);
 
     protected abstract <H extends OpHandler<Req, Res>> H selectHandler(Class<H> handlerClazz, Condition condition);
-
-    protected abstract ApplicationContext getApplicationContext();
 
     @Override
     public void handle(Context context) {

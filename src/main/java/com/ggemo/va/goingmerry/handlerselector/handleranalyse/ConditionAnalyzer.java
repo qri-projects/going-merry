@@ -9,5 +9,5 @@ import com.ggemo.va.handler.OpHandler;
  * @see ClassicConditionAnalyzer
  */
 public interface ConditionAnalyzer<AnalyseResult extends ConditionAnalyseResult> {
-    AnalyseResult analyse(Object condition, Class<? extends OpHandler<?, ?>> handlerClazz);
+    AnalyseResult analyse(Object condition);
 }

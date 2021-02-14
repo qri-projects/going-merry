@@ -10,6 +10,9 @@ import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
 import com.ggemo.va.handler.OpHandler;
 
+/**
+ * <p>GmStep相关设计见docs/gm-step-design.md
+ */
 public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelectorBasedGmStep<Context, Condition, Req, Res> {
     private MmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
@@ -42,11 +45,6 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
     @Override
     protected Condition generateMmCondition(Context context) {
         return mmConditionGenerator.gen(context);
-    }
-
-    @Override
-    protected ApplicationContext getApplicationContext() {
-        return GoingMerryConfig.getApplicationContext();
     }
 
     @Override

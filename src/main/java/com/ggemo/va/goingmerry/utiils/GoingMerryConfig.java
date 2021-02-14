@@ -5,6 +5,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+/**
+ * <p>使用时 要继承一下这个类并加上{@code @Configure}注解
+ */
 public class GoingMerryConfig implements ApplicationContextAware{
     private static ApplicationContext APPLICATION_CONTEXT;
 

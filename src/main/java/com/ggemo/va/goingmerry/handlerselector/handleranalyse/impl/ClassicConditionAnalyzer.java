@@ -13,10 +13,10 @@ import lombok.Data;
 /**
  * <p>{@link ConditionAnalyzer}的classic实现
  *
- * <p>将condition解析为一个map
+ * <p>将condition解析为一个{@link ClassicConditionAnalyseResult}
  */
 public class ClassicConditionAnalyzer
-        implements OpHandler<ClassicConditionAnalyzer.Req, ClassicConditionAnalyseResult>,
+        implements OpHandler<Object, ClassicConditionAnalyseResult>,
         ConditionAnalyzer<ClassicConditionAnalyseResult> {
     public static final String DEFAULT_FIELD = "value";
 
@@ -25,10 +25,8 @@ public class ClassicConditionAnalyzer
         return INSTANCE;
     }
 
-
     @Override
-    public ClassicConditionAnalyseResult handle(Req req) {
-        Object condition = req.getCondition();
+    public ClassicConditionAnalyseResult analyse(Object condition) {
         ClassicConditionAnalyseResult result = new ClassicConditionAnalyseResult();
 
         if (condition == null) {
@@ -75,15 +73,14 @@ public class ClassicConditionAnalyzer
         return result;
     }
 
+    /**
+     * <p>提供给step的handle方法, 调用{@link ClassicConditionAnalyzer#analyse}方法
+     *
+     * @param condition condition
+     * @return analyseResult
+     */
     @Override
-    public ClassicConditionAnalyseResult analyse(Object condition, Class<? extends OpHandler<?, ?>> handlerClazz) {
-        return handle(new Req(condition, handlerClazz));
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class Req {
-        Object condition;
-        Class<? extends OpHandler<?, ?>> handlerClazz;
+    public ClassicConditionAnalyseResult handle(Object condition) {
+        return analyse(condition);
     }
 }

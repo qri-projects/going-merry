@@ -3,6 +3,9 @@ package com.ggemo.va.goingmerry.op;
 import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.handler.OpHandler;
 
+/**
+ * <p>GmStep相关设计见docs/gm-step-design.md
+ */
 public abstract class HandlerSelectorBasedGmStep<Context, Condition, Req, Res>
         extends GmStep<Context, Condition, Req, Res>{
     public abstract HandlerSelector getHandlerSelector();

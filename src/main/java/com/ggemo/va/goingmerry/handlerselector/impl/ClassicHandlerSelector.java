@@ -15,9 +15,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>根据条件找实现类, {@link HandlerSelector}的classic实现
- *
- * <p>具体实现逻辑见{@link ClassicHandlerSelector#ClassicHandlerSelector()}
+ * <p>根据条件找实现类, {@link HandlerSelector}的classic实现<br/>
+ * 使用责任链的方式理清逻辑
  */
 public class ClassicHandlerSelector
         extends RichListPplBusiness<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>,
@@ -36,19 +35,17 @@ public class ClassicHandlerSelector
     private ClassicHandlerSelector() {
         // 初始化缓存工具, 方便从缓存取结果
         // 一个condition如果没有缓存的话, 要经过下面那些步骤(解析condition, 匹配解析结果等)才能拿到实现类
-        CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, ClassicConditionAnalyzer.Req,
-                OpHandler<?, ?>>
-                cacheStepUtil =
-                new CacheStepUtil<>(
-                        c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getMmHandlerClazz()),
-                        Context::getResHandler,
-                        (c, res) -> {
-                            if (res == null) {
-                                return;
-                            }
-                            c.setResHandler(res);
-                            c.setEarlyReturn(true);
-                        });
+        CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, Object,
+                OpHandler<?, ?>> cacheStepUtil = new CacheStepUtil<>(
+                Context::getMmCondition,
+                Context::getResHandler,
+                (c, res) -> {
+                    if (res == null) {
+                        return;
+                    }
+                    c.setResHandler(res);
+                    c.setEarlyReturn(true);
+                });
 
         // 从缓存中取值
         addStep(cacheStepUtil.getGetStep());
@@ -56,7 +53,7 @@ public class ClassicHandlerSelector
         // 对条件对象condition进行解析
         addStep(new ClassicOpStep<>(
                 ClassicConditionAnalyzer.getInstance(),
-                c -> new ClassicConditionAnalyzer.Req(c.getMmCondition(), c.getMmHandlerClazz()),
+                Context::getMmCondition,
                 Context::setAnalyseResult
         ));
 
