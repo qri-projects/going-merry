@@ -1,5 +1,6 @@
 package com.ggemo.va.goingmerry.op;
 
+import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.handler.OpHandler;
 
@@ -11,7 +12,7 @@ public abstract class HandlerSelectorBasedGmStep<Context, Condition, Req, Res>
     public abstract HandlerSelector getHandlerSelector();
 
     @Override
-    protected <H extends OpHandler<Req, Res>> H selectHandler(Class<H> handlerClazz, Condition condition) {
+    protected <H extends GmService<Condition, Req, Res>> H selectHandler(Class<H> handlerClazz, Condition condition) {
         return (H) getHandlerSelector().select(handlerClazz, condition);
     }
 }

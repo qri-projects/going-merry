@@ -2,7 +2,10 @@ package com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+
+import org.springframework.stereotype.Component;
 
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.handler.OpHandler;
@@ -15,15 +18,11 @@ import lombok.Data;
  *
  * <p>将condition解析为一个{@link ClassicConditionAnalyseResult}
  */
+@Component
 public class ClassicConditionAnalyzer
         implements OpHandler<Object, ClassicConditionAnalyseResult>,
         ConditionAnalyzer<ClassicConditionAnalyseResult> {
     public static final String DEFAULT_FIELD = "value";
-
-    private static final ClassicConditionAnalyzer INSTANCE = new ClassicConditionAnalyzer();
-    public static ClassicConditionAnalyzer getInstance() {
-        return INSTANCE;
-    }
 
     @Override
     public ClassicConditionAnalyseResult analyse(Object condition) {
@@ -49,9 +48,16 @@ public class ClassicConditionAnalyzer
         }
 
         // todo: 不完善
-        // list set等collection
+        // list等collection
         if (condition instanceof Collection) {
-            Collection<Object> conditionCollection = (Collection<Object>) condition;
+            Collection<?> conditionCollection = (Collection<?>) condition;
+
+            if (condition instanceof HashSet) {
+                HashSet<?> conditionSet = (HashSet<?>) condition;
+                conditionSet.add(null);
+            }
+
+
             for (Object o : conditionCollection) {
                 result.put(o, true);
             }

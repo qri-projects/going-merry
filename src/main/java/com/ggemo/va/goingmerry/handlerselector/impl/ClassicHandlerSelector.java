@@ -1,8 +1,15 @@
 package com.ggemo.va.goingmerry.handlerselector.impl;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.ggemo.va.business.pipeline.RichListPplBusiness;
+import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handlerregistry.impl.ClassicHandlerRegistry;
@@ -18,25 +25,24 @@ import lombok.NoArgsConstructor;
  * <p>根据条件找实现类, {@link HandlerSelector}的classic实现<br/>
  * 使用责任链的方式理清逻辑
  */
+@Component
 public class ClassicHandlerSelector
         extends RichListPplBusiness<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>,
-        ClassicHandlerSelector.Req, OpHandler<?, ?>>
+        ClassicHandlerSelector.Req, GmService<?, ?, ?>>
         implements HandlerSelector {
-    private static ClassicHandlerSelector INSTANCE;
 
-    public static ClassicHandlerSelector getInstance() {
-        if (INSTANCE != null) {
-            return INSTANCE;
-        }
-        INSTANCE = new ClassicHandlerSelector();
-        return INSTANCE;
-    }
+    @Autowired
+    ClassicConditionAnalyzer conditionAnalyzer;
 
-    private ClassicHandlerSelector() {
+    @Autowired
+    ClassicHandlerRegistry handlerRegistry;
+
+    @PostConstruct
+    public void init() {
         // 初始化缓存工具, 方便从缓存取结果
         // 一个condition如果没有缓存的话, 要经过下面那些步骤(解析condition, 匹配解析结果等)才能拿到实现类
         CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, Object,
-                OpHandler<?, ?>> cacheStepUtil = new CacheStepUtil<>(
+                GmService<?, ?, ?>> cacheStepUtil = new CacheStepUtil<>(
                 Context::getMmCondition,
                 Context::getResHandler,
                 (c, res) -> {
@@ -52,14 +58,14 @@ public class ClassicHandlerSelector
 
         // 对条件对象condition进行解析
         addStep(new ClassicOpStep<>(
-                ClassicConditionAnalyzer.getInstance(),
+                conditionAnalyzer,
                 Context::getMmCondition,
                 Context::setAnalyseResult
         ));
 
         // 根据解析结果找到匹配的OpHandler
         addStep(new ClassicOpStep<>(
-                ClassicHandlerRegistry.getInstance(),
+                handlerRegistry,
                 c -> new ClassicHandlerRegistry.Req(c.getMmHandlerClazz(), c.getAnalyseResult()),
                 Context::setResHandler
         ));
@@ -77,12 +83,12 @@ public class ClassicHandlerSelector
     }
 
     @Override
-    protected OpHandler<?, ?> castToRes(Context context) {
+    protected GmService<?, ?, ?> castToRes(Context context) {
         return context.getResHandler();
     }
 
     @Override
-    public OpHandler<?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition) {
+    public GmService<?, ?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition) {
         Req req = new Req();
         req.setMmCondition(mmCondition);
         req.setHandlerClazz(handlerClazz);
@@ -97,7 +103,7 @@ public class ClassicHandlerSelector
 
         AnalyseResult analyseResult;
 
-        OpHandler<?, ?> resHandler;
+        GmService<?, ?, ?> resHandler;
 
         boolean earlyReturn = false;
 

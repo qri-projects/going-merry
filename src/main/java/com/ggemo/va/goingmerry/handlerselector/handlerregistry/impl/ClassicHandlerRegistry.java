@@ -10,17 +10,16 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.ggemo.va.goingmerry.gmservice.GgConditionWrapper;
 import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
-import com.ggemo.va.goingmerry.utiils.GoingMerryConfig;
+import com.ggemo.va.goingmerry.utiils.GoingMerryAutoConfig;
 import com.ggemo.va.handler.OpHandler;
 
 import lombok.AllArgsConstructor;
@@ -29,45 +28,25 @@ import lombok.Data;
 /**
  * <p>{@link HandlerRegistry}的classic实现
  */
+@Component
 public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>,
-        OpHandler<ClassicHandlerRegistry.Req, OpHandler<?, ?>> {
+        OpHandler<ClassicHandlerRegistry.Req, GmService<?, ?, ?>> {
     // 存放handler的map, 取handler的时候按handlerClazz取, 根据analyseResult找权重最高的handler取
-    private static final Map<Class<? extends OpHandler>, Map<OpHandler<?, ?>, List<ClassicConditionAnalyseResult>>>
+    private static final Map<Class<? extends OpHandler>, Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>>>
             GG_HANDLERS_HOLDER = new HashMap<>();
 
-    // 记录handler的class是否已经注册过了
-    private static final Set<Class<? extends OpHandler<?, ?>>> REGISTERED_SET = new HashSet<>();
-
-    // 单例
-    private static ClassicHandlerRegistry INSTANCE = null;
-
-    public static ClassicHandlerRegistry getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ClassicHandlerRegistry();
-        }
-        return INSTANCE;
-    }
-
-    private final ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
-
-    private ClassicHandlerRegistry() {
-        this.analyzer = ClassicConditionAnalyzer.getInstance();
-    }
+    @Autowired
+    private ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
 
     private ApplicationContext getApplicationContext() {
-        return GoingMerryConfig.getApplicationContext();
+        return GoingMerryAutoConfig.getApplicationContext();
     }
 
     @Override
-    public OpHandler<?, ?> findHandler(ClassicConditionAnalyseResult mmAnalyseResult,
+    public GmService<?, ?, ?> findHandler(ClassicConditionAnalyseResult mmAnalyseResult,
                                        Class<? extends OpHandler<?, ?>> handlerClazz) {
-        // handlerClazz还没有注册的话 先初始化注册
-        if (!this.registered(handlerClazz)) {
-            this.initRegister(handlerClazz);
-        }
-
         // 存放匹配的handler. key: handler, value: 命中的special条件数
-        Map<OpHandler<?, ?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedHandlers = new HashMap<>();
+        Map<GmService<?, ?, ?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedHandlers = new HashMap<>();
 
         if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
             // todo: no handler matches
@@ -112,10 +91,10 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
         // 在所有匹配中选出权重最高的. 用一个list来记录权重最高的handler, 来发现有两个handler权重一样且都为最高的情况
         int mostMatchedWeight = -1;
-        List<OpHandler<?, ?>> mostMatchedHandlers = new ArrayList<>();
+        List<GmService<?, ?, ?>> mostMatchedHandlers = new ArrayList<>();
 
         // 遍历handler
-        for (OpHandler<?, ?> matchedHandler : matchedHandlers.keySet()) {
+        for (GmService<?, ?, ?> matchedHandler : matchedHandlers.keySet()) {
 
             // 该handler下的最高权重
             OptionalInt matchedWeightOptional = matchedHandlers.get(matchedHandler)
@@ -150,44 +129,28 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     }
 
     @Override
-    public void initRegister(Class<? extends OpHandler<?, ?>> handlerClazz) {
-        ApplicationContext applicationContext = getApplicationContext();
-
-        // 遍历所有该类的bean的名字
-        String[] beanNames = applicationContext.getBeanNamesForType(handlerClazz);
-        for (String beanName : beanNames) {
-
-            // 找到注解
-            GmService gmService = applicationContext.findAnnotationOnBean(beanName, GmService.class);
-            if (gmService == null) {
-                continue;
-            }
-
-            // 找到注解下的所有ggCondition
-            for (Class<? extends GgConditionWrapper<?>> conditionWrapperClazz : gmService.value()) {
-                GgConditionWrapper<?> ggConditionWrapper = BeanUtils.instantiateClass(conditionWrapperClazz);
-                Object ggCondition = ggConditionWrapper.getGgCondition();
-
+    public void initRegister() {
+        ApplicationContext appC = getApplicationContext();
+        for (String beanName : appC.getBeanNamesForType(GmService.class)) {
+            GmService<?, ?, ?> bean = appC.getBean(beanName, GmService.class);
+            bean.getConditions().forEach(c -> {
                 // 解析ggCondition
-                ClassicConditionAnalyseResult result = analyzer.analyse(ggCondition);
+                ClassicConditionAnalyseResult result = analyzer.analyse(c);
 
                 // 注册
-                register(result, applicationContext.getBean(beanName, handlerClazz));
-            }
+                register(result, bean);
+            });
         }
-
-        // 标记该handlerClazz已经注册过了
-        REGISTERED_SET.add(handlerClazz);
     }
 
     @Override
-    public void register(ClassicConditionAnalyseResult analyseResult, OpHandler<?, ?> handler) {
+    public void register(ClassicConditionAnalyseResult analyseResult, GmService<?, ?, ?> handler) {
         // 注册一个handler要将其所有父类注册上去
         Set<Class<?>> registerClasses = getHandlerSuperClasses(handler.getClass());
         for (Class handlerClazz : registerClasses) {
 
             // 下面的逻辑都是简单地将analyseResult, handler放进map中, 由于需要判空所以写起来有点复杂
-            Map<OpHandler<?, ?>, List<ClassicConditionAnalyseResult>> handlerAnalyseResultMap;
+            Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>> handlerAnalyseResultMap;
             if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
                 handlerAnalyseResultMap = new HashMap<>();
                 GG_HANDLERS_HOLDER.put(handlerClazz, handlerAnalyseResultMap);
@@ -205,17 +168,11 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
             analyseResults.add(analyseResult);
         }
     }
-
-    @Override
-    public boolean registered(Class<? extends OpHandler<?, ?>> handlerClazz) {
-        return REGISTERED_SET.contains(handlerClazz);
-    }
-
     /**
      * <p>作为handler提供的方法
      */
     @Override
-    public OpHandler<?, ?> handle(Req req) {
+    public GmService<?, ?, ?> handle(Req req) {
         return this.findHandler(req.getAnalyseResult(), req.getMmHandlerClazz());
     }
 

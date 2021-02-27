@@ -1,5 +1,6 @@
 package com.ggemo.va.goingmerry.handlerselector.handlerregistry;
 
+import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyseResult;
 import com.ggemo.va.handler.OpHandler;
 
@@ -8,11 +9,9 @@ import com.ggemo.va.handler.OpHandler;
  * @param <AnalyseResult> 注册的{@link ConditionAnalyseResult}类型
  */
 public interface HandlerRegistry<AnalyseResult extends ConditionAnalyseResult> {
-    void register(AnalyseResult analyseResult, OpHandler<?, ?> handler);
+    void initRegister();
 
-    OpHandler<?, ?> findHandler(AnalyseResult analyseResult, Class<? extends OpHandler<?, ?>> handlerClazz);
+    void register(AnalyseResult analyseResult, GmService<?, ?, ?> handler);
 
-    void initRegister(Class<? extends OpHandler<?, ?>> handlerClazz);
-
-    boolean registered(Class<? extends OpHandler<?, ?>> handlerClazz);
+    GmService<?, ?, ?> findHandler(AnalyseResult analyseResult, Class<? extends OpHandler<?, ?>> handlerClazz);
 }

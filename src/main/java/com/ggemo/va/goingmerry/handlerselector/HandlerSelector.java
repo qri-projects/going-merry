@@ -1,5 +1,6 @@
 package com.ggemo.va.goingmerry.handlerselector;
 
+import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.impl.ClassicHandlerSelector;
 import com.ggemo.va.handler.OpHandler;
 
@@ -15,5 +16,5 @@ public interface HandlerSelector {
      * @param mmCondition // todo: mmCondition文档  condition
      * @return {@link OpHandler}具体实现类
      */
-    OpHandler<?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition);
+    GmService<?, ?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition);
 }
