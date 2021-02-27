@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
+import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 import com.ggemo.va.handler.OpHandler;
@@ -36,7 +36,7 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
             GG_HANDLERS_HOLDER = new HashMap<>();
 
     @Autowired
-    private ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
+    private ClassicConditionAnalyzer analyzer;
 
     private ApplicationContext getApplicationContext() {
         return ApplicationContextUtil.getApplicationContext();
