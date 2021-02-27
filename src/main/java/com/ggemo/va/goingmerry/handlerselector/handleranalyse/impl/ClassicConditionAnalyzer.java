@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.handler.OpHandler;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 /**
  * <p>{@link ConditionAnalyzer}的classic实现
  *

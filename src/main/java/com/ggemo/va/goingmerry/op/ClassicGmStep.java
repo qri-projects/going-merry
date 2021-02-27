@@ -1,14 +1,11 @@
 package com.ggemo.va.goingmerry.op;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
 import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
-import com.ggemo.va.handler.OpHandler;
 
 /**
  * <p>GmStep相关设计见docs/gm-step-design.md
