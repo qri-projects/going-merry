@@ -9,7 +9,6 @@ import com.ggemo.va.business.pipeline.RichListPplBusiness;
 import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyseResult;
-import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handlerregistry.impl.ClassicHandlerRegistry;

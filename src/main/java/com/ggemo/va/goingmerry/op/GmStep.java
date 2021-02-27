@@ -1,7 +1,5 @@
 package com.ggemo.va.goingmerry.op;
 
-import org.springframework.context.ApplicationContext;
-
 import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.handler.OpHandler;
 import com.ggemo.va.step.BaseOpStep;

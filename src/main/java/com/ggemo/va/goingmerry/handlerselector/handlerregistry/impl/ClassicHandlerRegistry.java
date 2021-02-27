@@ -19,7 +19,6 @@ import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
-import com.ggemo.va.goingmerry.config.GoingMerryAutoConfig;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 import com.ggemo.va.handler.OpHandler;
 
@@ -33,7 +32,7 @@ import lombok.Data;
 public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>,
         OpHandler<ClassicHandlerRegistry.Req, GmService<?, ?, ?>> {
     // 存放handler的map, 取handler的时候按handlerClazz取, 根据analyseResult找权重最高的handler取
-    private static final Map<Class<? extends OpHandler>, Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>>>
+    private static final Map<Class<?>, Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>>>
             GG_HANDLERS_HOLDER = new HashMap<>();
 
     @Autowired
@@ -148,7 +147,7 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     public void register(ClassicConditionAnalyseResult analyseResult, GmService<?, ?, ?> handler) {
         // 注册一个handler要将其所有父类注册上去
         Set<Class<?>> registerClasses = getHandlerSuperClasses(handler.getClass());
-        for (Class handlerClazz : registerClasses) {
+        for (Class<?> handlerClazz : registerClasses) {
 
             // 下面的逻辑都是简单地将analyseResult, handler放进map中, 由于需要判空所以写起来有点复杂
             Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>> handlerAnalyseResultMap;
@@ -223,8 +222,7 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
      * @see #getHandlerSuperClasses
      */
     private static Set<Class<?>> getInterfacesAndSuperClass(Class<?> clazz) {
-        Set<Class<?>> set = new HashSet<>();
-        set.addAll(Arrays.asList(clazz.getInterfaces()));
+        Set<Class<?>> set = new HashSet<>(Arrays.asList(clazz.getInterfaces()));
         set.add(clazz.getSuperclass());
         return set;
     }
