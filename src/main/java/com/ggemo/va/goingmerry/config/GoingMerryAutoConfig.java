@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * <p>使用时 可以继承一下这个类并加上{@code @Configure}注解进行配置
  */
 @Configuration
-@ConditionalOnClass({GmService.class, Object.class})
+@ConditionalOnClass({GmService.class})
 @ComponentScan({"com.ggemo.va.goingmerry"})
 @Slf4j
 public class GoingMerryAutoConfig implements ApplicationListener<ContextRefreshedEvent> {
