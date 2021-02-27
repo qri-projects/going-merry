@@ -19,7 +19,8 @@ import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
-import com.ggemo.va.goingmerry.utiils.GoingMerryAutoConfig;
+import com.ggemo.va.goingmerry.config.GoingMerryAutoConfig;
+import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 import com.ggemo.va.handler.OpHandler;
 
 import lombok.AllArgsConstructor;
@@ -39,7 +40,7 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     private ConditionAnalyzer<ClassicConditionAnalyseResult> analyzer;
 
     private ApplicationContext getApplicationContext() {
-        return GoingMerryAutoConfig.getApplicationContext();
+        return ApplicationContextUtil.getApplicationContext();
     }
 
     @Override

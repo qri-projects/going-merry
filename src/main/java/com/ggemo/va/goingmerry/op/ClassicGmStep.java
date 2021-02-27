@@ -7,6 +7,7 @@ import com.ggemo.va.contextadaptor.step.StepResApplier;
 import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
+import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 import com.ggemo.va.handler.OpHandler;
 
 /**
@@ -16,8 +17,6 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
     private MmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
     private StepResApplier<Context, Res> resApplier;
-
-    @Autowired
     private HandlerSelector handlerSelector;
 
     public ClassicGmStep(Class<? extends GmService<Condition, Req, Res>> handlerClass,
@@ -28,6 +27,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
         this.mmConditionGenerator = mmConditionGenerator;
         this.reqGenerator = reqGenerator;
         this.resApplier = resApplier;
+        this.handlerSelector = null;
     }
 
     public ClassicGmStep(Class<? extends GmService<Condition, Req, Res>> handlerClass,
@@ -56,6 +56,10 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
 
     @Override
     public HandlerSelector getHandlerSelector() {
+        if (handlerSelector != null) {
+            return handlerSelector;
+        }
+        handlerSelector = ApplicationContextUtil.getApplicationContext().getBean(HandlerSelector.class);
         return handlerSelector;
     }
 }
