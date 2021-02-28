@@ -11,7 +11,7 @@ import com.ggemo.va.handler.OpHandler;
 public interface HandlerRegistry<AnalyseResult extends ConditionAnalyseResult> {
     void initRegister();
 
-    void register(AnalyseResult analyseResult, GmService<?, ?, ?> handler);
+    void register(AnalyseResult analyseResult, GmService<?, ?, ?> service);
 
     GmService<?, ?, ?> findHandler(AnalyseResult analyseResult, Class<? extends OpHandler<?, ?>> handlerClazz);
 }

@@ -144,28 +144,19 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     }
 
     @Override
-    public void register(ClassicConditionAnalyseResult analyseResult, GmService<?, ?, ?> handler) {
+    public void register(ClassicConditionAnalyseResult analyseResult, GmService<?, ?, ?> service) {
         // 注册一个handler要将其所有父类注册上去
-        Set<Class<?>> registerClasses = getHandlerSuperClasses(handler.getClass());
+        Set<Class<?>> registerClasses = getServerSuperClasses(service.getClass());
         for (Class<?> handlerClazz : registerClasses) {
 
-            // 下面的逻辑都是简单地将analyseResult, handler放进map中, 由于需要判空所以写起来有点复杂
-            Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>> handlerAnalyseResultMap;
+            // 将analyseResult, handler放进map中
             if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
-                handlerAnalyseResultMap = new HashMap<>();
-                GG_HANDLERS_HOLDER.put(handlerClazz, handlerAnalyseResultMap);
-            } else {
-                handlerAnalyseResultMap = GG_HANDLERS_HOLDER.get(handlerClazz);
+                GG_HANDLERS_HOLDER.put(handlerClazz, new HashMap<>());
             }
-
-            List<ClassicConditionAnalyseResult> analyseResults;
-            if (!handlerAnalyseResultMap.containsKey(handler)) {
-                analyseResults = new ArrayList<>();
-                handlerAnalyseResultMap.put(handler, analyseResults);
-            } else {
-                analyseResults = handlerAnalyseResultMap.get(handler);
+            if(!GG_HANDLERS_HOLDER.get(handlerClazz).containsKey(service)) {
+                GG_HANDLERS_HOLDER.get(handlerClazz).put(service, new ArrayList<>());
             }
-            analyseResults.add(analyseResult);
+            GG_HANDLERS_HOLDER.get(handlerClazz).get(service).add(analyseResult);
         }
     }
     /**
@@ -184,26 +175,26 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     }
 
     /**
-     * <p>工具方法, 找到给定类的所有继承自{@link OpHandler}的接口和父类
+     * <p>工具方法, 找到给定类的所有继承自{@link GmService}的接口和父类
      * @param clazz 给定类
      * @return 所有父类和所有接口
      */
-    private static Set<Class<?>> getHandlerSuperClasses(Class<?> clazz) {
+    private static Set<Class<?>> getServerSuperClasses(Class<?> clazz) {
         Set<Class<?>> res = new HashSet<>();
 
         // 递归的出口
         if (clazz == null) {
             return res;
         }
-        if (clazz.equals(OpHandler.class)) {
-            res.add(OpHandler.class);
+        if (clazz.equals(GmService.class)) {
+            res.add(GmService.class);
             return res;
         }
 
         // 遍历所有上面一层的类和接口
         for (Class<?> superClazzes : getInterfacesAndSuperClass(clazz)) {
             // 递归地获取其所有继承自OpHandler的接口和父类
-            Set<Class<?>> superRes = getHandlerSuperClasses(superClazzes);
+            Set<Class<?>> superRes = getServerSuperClasses(superClazzes);
             if (CollectionUtils.isEmpty(superRes)) {
                 continue;
             }
@@ -219,7 +210,7 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
     /**
      * <p>工具方法, 找到给定类的接口和父类(一层)
-     * @see #getHandlerSuperClasses
+     * @see #getServerSuperClasses
      */
     private static Set<Class<?>> getInterfacesAndSuperClass(Class<?> clazz) {
         Set<Class<?>> set = new HashSet<>(Arrays.asList(clazz.getInterfaces()));

@@ -87,11 +87,12 @@ public class ClassicHandlerSelector
     }
 
     @Override
-    public GmService<?, ?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition) {
+    public <Condition, HandlerReq, HandlerRes, S extends GmService<Condition, HandlerReq, HandlerRes>> S select(
+            Class<S> handlerClazz, Condition mmCondition) {
         Req req = new Req();
         req.setMmCondition(mmCondition);
         req.setHandlerClazz(handlerClazz);
-        return handle(req);
+        return (S) handle(req);
     }
 
     @Data

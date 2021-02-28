@@ -16,5 +16,6 @@ public interface HandlerSelector {
      * @param mmCondition // todo: mmCondition文档  condition
      * @return {@link OpHandler}具体实现类
      */
-    GmService<?, ?, ?> select(Class<? extends OpHandler<?, ?>> handlerClazz, Object mmCondition);
+    <Condition, HandlerReq, HandlerRes, S extends GmService<Condition, HandlerReq, HandlerRes>> S select(
+            Class<S> handlerClazz, Condition mmCondition);
 }

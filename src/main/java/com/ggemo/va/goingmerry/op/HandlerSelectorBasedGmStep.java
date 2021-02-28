@@ -12,6 +12,6 @@ public abstract class HandlerSelectorBasedGmStep<Context, Condition, Req, Res>
 
     @Override
     protected <Service extends GmService<Condition, Req, Res>> Service selectHandler(Class<Service> handlerClazz, Condition condition) {
-        return (Service) getHandlerSelector().select(handlerClazz, condition);
+        return getHandlerSelector().select(handlerClazz, condition);
     }
 }
