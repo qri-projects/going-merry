@@ -1,6 +1,6 @@
-package com.ggemo.va.goingmerry.handlerselector.handleranalyse;
+package com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer;
 
-import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
+import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyzer;
 
 /**
  * <p>解析condition的接口

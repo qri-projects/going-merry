@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.handlerselector.handleranalyse;
+package com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer;
 
 /**
  * <p>对condition进行解析得出的结果

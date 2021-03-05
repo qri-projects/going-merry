@@ -3,15 +3,15 @@ package com.ggemo.va.goingmerry.op;
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
 import com.ggemo.va.goingmerry.gmservice.GmHandlerService;
-import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.handlerselector.GmServiceSelector;
+import com.ggemo.va.goingmerry.gmserviceselector.GmServiceSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 
 /**
  * <p>GmStep相关设计见docs/gm-step-design.md
  */
-public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelectorBasedGmStep<Context, Condition, Req, Res> {
+public class ClassicGmStep<Context, Condition, Req, Res> extends
+        GmserviceSelectorBasedGmStep<Context, Condition, Req, Res> {
     private MmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
     private StepResApplier<Context, Res> resApplier;
@@ -53,7 +53,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
     }
 
     @Override
-    public GmServiceSelector getHandlerSelector() {
+    public GmServiceSelector getGmServiceSelector() {
         if (gmServiceSelector != null) {
             return gmServiceSelector;
         }

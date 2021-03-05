@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
+import com.ggemo.va.goingmerry.gmserviceselector.gmserviceregistry.GmServiceRegistry;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +31,10 @@ public class GoingMerryAutoConfig implements ApplicationListener<ContextRefreshe
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        HandlerRegistry<?> handlerRegistry =
-                ApplicationContextUtil.getApplicationContext().getBean(HandlerRegistry.class);
-        log.info("Going Merry: ==start== init handler register");
-        handlerRegistry.initRegister();
-        log.info("Going Merry: ===end=== init handler register");
+        GmServiceRegistry<?> gmServiceRegistry =
+                ApplicationContextUtil.getApplicationContext().getBean(GmServiceRegistry.class);
+        log.info("Going Merry: ==start== init gmService register");
+        gmServiceRegistry.initRegister();
+        log.info("Going Merry: ===end=== init gmService register");
     }
 }

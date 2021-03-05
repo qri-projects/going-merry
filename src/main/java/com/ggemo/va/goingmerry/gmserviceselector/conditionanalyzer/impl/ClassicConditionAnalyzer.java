@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl;
+package com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyzer;
+import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.ConditionAnalyzer;
 import com.ggemo.va.handler.OpHandler;
 
 /**
