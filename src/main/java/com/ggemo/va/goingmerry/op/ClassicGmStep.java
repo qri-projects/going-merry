@@ -2,8 +2,9 @@ package com.ggemo.va.goingmerry.op;
 
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
+import com.ggemo.va.goingmerry.gmservice.GmHandlerService;
 import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
+import com.ggemo.va.goingmerry.handlerselector.GmServiceSelector;
 import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 
@@ -14,9 +15,9 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
     private MmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
     private StepResApplier<Context, Res> resApplier;
-    private HandlerSelector handlerSelector;
+    private GmServiceSelector gmServiceSelector;
 
-    public ClassicGmStep(Class<? extends GmService<Condition, Req, Res>> handlerClass,
+    public ClassicGmStep(Class<? extends GmHandlerService<Condition, Req, Res>> handlerClass,
                          MmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier) {
@@ -24,16 +25,16 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
         this.mmConditionGenerator = mmConditionGenerator;
         this.reqGenerator = reqGenerator;
         this.resApplier = resApplier;
-        this.handlerSelector = null;
+        this.gmServiceSelector = null;
     }
 
-    public ClassicGmStep(Class<? extends GmService<Condition, Req, Res>> handlerClass,
+    public ClassicGmStep(Class<? extends GmHandlerService<Condition, Req, Res>> handlerClass,
                          MmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier,
-                         HandlerSelector handlerSelector) {
+                         GmServiceSelector gmServiceSelector) {
         this(handlerClass, mmConditionGenerator, reqGenerator, resApplier);
-        this.handlerSelector = handlerSelector;
+        this.gmServiceSelector = gmServiceSelector;
     }
 
     @Override
@@ -52,11 +53,11 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends HandlerSelector
     }
 
     @Override
-    public HandlerSelector getHandlerSelector() {
-        if (handlerSelector != null) {
-            return handlerSelector;
+    public GmServiceSelector getHandlerSelector() {
+        if (gmServiceSelector != null) {
+            return gmServiceSelector;
         }
-        handlerSelector = ApplicationContextUtil.getApplicationContext().getBean(HandlerSelector.class);
-        return handlerSelector;
+        gmServiceSelector = ApplicationContextUtil.getApplicationContext().getBean(GmServiceSelector.class);
+        return gmServiceSelector;
     }
 }

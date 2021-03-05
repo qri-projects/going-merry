@@ -29,10 +29,10 @@ import lombok.Data;
  * <p>{@link HandlerRegistry}的classic实现
  */
 @Component
-public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>,
-        OpHandler<ClassicHandlerRegistry.Req, GmService<?, ?, ?>> {
+public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>,
+        OpHandler<ClassicGmServiceRegistry.Req, GmService<?>> {
     // 存放handler的map, 取handler的时候按handlerClazz取, 根据analyseResult找权重最高的handler取
-    private static final Map<Class<?>, Map<GmService<?, ?, ?>, List<ClassicConditionAnalyseResult>>>
+    private static final Map<Class<?>, Map<GmService<?>, List<ClassicConditionAnalyseResult>>>
             GG_HANDLERS_HOLDER = new HashMap<>();
 
     @Autowired
@@ -43,10 +43,10 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     }
 
     @Override
-    public GmService<?, ?, ?> findHandler(ClassicConditionAnalyseResult mmAnalyseResult,
-                                       Class<? extends OpHandler<?, ?>> handlerClazz) {
+    public <S extends GmService<?>> S findHandler(ClassicConditionAnalyseResult mmAnalyseResult,
+                                       Class<S> handlerClazz) {
         // 存放匹配的handler. key: handler, value: 命中的special条件数
-        Map<GmService<?, ?, ?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedHandlers = new HashMap<>();
+        Map<GmService<?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedHandlers = new HashMap<>();
 
         if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
             // todo: no handler matches
@@ -91,10 +91,10 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
 
         // 在所有匹配中选出权重最高的. 用一个list来记录权重最高的handler, 来发现有两个handler权重一样且都为最高的情况
         int mostMatchedWeight = -1;
-        List<GmService<?, ?, ?>> mostMatchedHandlers = new ArrayList<>();
+        List<GmService<?>> mostMatchedHandlers = new ArrayList<>();
 
         // 遍历handler
-        for (GmService<?, ?, ?> matchedHandler : matchedHandlers.keySet()) {
+        for (GmService<?> matchedHandler : matchedHandlers.keySet()) {
 
             // 该handler下的最高权重
             OptionalInt matchedWeightOptional = matchedHandlers.get(matchedHandler)
@@ -125,14 +125,14 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
         if (mostMatchedHandlers.size() > 1) {
             throw new RuntimeException("// todo: 匹配冲突, 有两个handler匹配到");
         }
-        return mostMatchedHandlers.get(0);
+        return (S)mostMatchedHandlers.get(0);
     }
 
     @Override
     public void initRegister() {
         ApplicationContext appC = getApplicationContext();
         for (String beanName : appC.getBeanNamesForType(GmService.class)) {
-            GmService<?, ?, ?> bean = appC.getBean(beanName, GmService.class);
+            GmService<?> bean = appC.getBean(beanName, GmService.class);
             bean.getConditions().forEach(c -> {
                 // 解析ggCondition
                 ClassicConditionAnalyseResult result = analyzer.analyse(c);
@@ -144,7 +144,7 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
     }
 
     @Override
-    public void register(ClassicConditionAnalyseResult analyseResult, GmService<?, ?, ?> service) {
+    public void register(ClassicConditionAnalyseResult analyseResult, GmService<?> service) {
         // 注册一个handler要将其所有父类注册上去
         Set<Class<?>> registerClasses = getServerSuperClasses(service.getClass());
         for (Class<?> handlerClazz : registerClasses) {
@@ -163,14 +163,14 @@ public class ClassicHandlerRegistry implements HandlerRegistry<ClassicConditionA
      * <p>作为handler提供的方法
      */
     @Override
-    public GmService<?, ?, ?> handle(Req req) {
-        return this.findHandler(req.getAnalyseResult(), req.getMmHandlerClazz());
+    public GmService<?> handle(Req req) {
+        return this.findHandler(req.getAnalyseResult(), req.getMmServiceClazz());
     }
 
     @Data
     @AllArgsConstructor
     public static class Req {
-        Class<? extends OpHandler<?, ?>> mmHandlerClazz;
+        Class<? extends GmService<?>> mmServiceClazz;
         ClassicConditionAnalyseResult analyseResult;
     }
 

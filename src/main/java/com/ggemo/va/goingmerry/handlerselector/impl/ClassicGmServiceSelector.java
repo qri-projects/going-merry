@@ -7,12 +7,11 @@ import org.springframework.stereotype.Component;
 
 import com.ggemo.va.business.pipeline.RichListPplBusiness;
 import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.handlerselector.HandlerSelector;
+import com.ggemo.va.goingmerry.handlerselector.GmServiceSelector;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.ConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
-import com.ggemo.va.goingmerry.handlerselector.handlerregistry.impl.ClassicHandlerRegistry;
-import com.ggemo.va.handler.OpHandler;
+import com.ggemo.va.goingmerry.handlerselector.handlerregistry.impl.ClassicGmServiceRegistry;
 import com.ggemo.va.opentity.OpRichContext;
 import com.ggemo.va.step.ClassicOpStep;
 import com.ggemo.va.step.useutils.CacheStepUtil;
@@ -21,27 +20,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>根据条件找实现类, {@link HandlerSelector}的classic实现<br/>
+ * <p>根据条件找实现类, {@link GmServiceSelector}的classic实现<br/>
  * 使用责任链的方式理清逻辑
  */
 @Component
-public class ClassicHandlerSelector
-        extends RichListPplBusiness<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>,
-        ClassicHandlerSelector.Req, GmService<?, ?, ?>>
-        implements HandlerSelector {
+public class ClassicGmServiceSelector
+        extends RichListPplBusiness<ClassicGmServiceSelector.Context<ClassicConditionAnalyseResult>,
+        ClassicGmServiceSelector.Req, GmService<?>>
+        implements GmServiceSelector {
 
     @Autowired
     ClassicConditionAnalyzer conditionAnalyzer;
 
     @Autowired
-    ClassicHandlerRegistry handlerRegistry;
+    ClassicGmServiceRegistry handlerRegistry;
 
     @PostConstruct
     public void init() {
         // 初始化缓存工具, 方便从缓存取结果
         // 一个condition如果没有缓存的话, 要经过下面那些步骤(解析condition, 匹配解析结果等)才能拿到实现类
-        CacheStepUtil<ClassicHandlerSelector.Context<ClassicConditionAnalyseResult>, Object,
-                GmService<?, ?, ?>> cacheStepUtil = new CacheStepUtil<>(
+        CacheStepUtil<ClassicGmServiceSelector.Context<ClassicConditionAnalyseResult>, Object,
+                GmService<?>> cacheStepUtil = new CacheStepUtil<>(
                 Context::getMmCondition,
                 Context::getResHandler,
                 (c, res) -> {
@@ -65,7 +64,7 @@ public class ClassicHandlerSelector
         // 根据解析结果找到匹配的OpHandler
         addStep(new ClassicOpStep<>(
                 handlerRegistry,
-                c -> new ClassicHandlerRegistry.Req(c.getMmHandlerClazz(), c.getAnalyseResult()),
+                c -> new ClassicGmServiceRegistry.Req(c.getMmHandlerClazz(), c.getAnalyseResult()),
                 Context::setResHandler
         ));
 
@@ -82,12 +81,12 @@ public class ClassicHandlerSelector
     }
 
     @Override
-    protected GmService<?, ?, ?> castToRes(Context context) {
+    protected GmService<?> castToRes(Context context) {
         return context.getResHandler();
     }
 
     @Override
-    public <Condition, HandlerReq, HandlerRes, S extends GmService<Condition, HandlerReq, HandlerRes>> S select(
+    public <Condition, S extends GmService<Condition>> S select(
             Class<S> handlerClazz, Condition mmCondition) {
         Req req = new Req();
         req.setMmCondition(mmCondition);
@@ -98,12 +97,12 @@ public class ClassicHandlerSelector
     @Data
     @NoArgsConstructor
     public static class Context<AnalyseResult extends ConditionAnalyseResult> implements OpRichContext {
-        Class<? extends OpHandler<?, ?>> mmHandlerClazz;
+        Class<? extends GmService<?>> mmHandlerClazz;
         Object mmCondition;
 
         AnalyseResult analyseResult;
 
-        GmService<?, ?, ?> resHandler;
+        GmService<?> resHandler;
 
         boolean earlyReturn = false;
 
@@ -116,7 +115,7 @@ public class ClassicHandlerSelector
     @Data
     @NoArgsConstructor
     static class Req {
-        Class<? extends OpHandler<?, ?>> handlerClazz;
+        Class<? extends GmService<?>> handlerClazz;
         Object mmCondition;
     }
 }

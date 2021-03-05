@@ -4,6 +4,6 @@ import java.util.Set;
 
 import com.ggemo.va.handler.OpHandler;
 
-public interface GmService<Condition, Req, Res> extends OpHandler<Req, Res> {
+public interface GmService<Condition>{
     Set<Condition> getConditions();
 }

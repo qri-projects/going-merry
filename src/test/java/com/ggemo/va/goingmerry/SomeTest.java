@@ -1,8 +1,13 @@
 package com.ggemo.va.goingmerry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.ggemo.va.handler.OpHandler;
 
@@ -66,7 +71,6 @@ public class SomeTest {
         return res;
     }
 
-    public static void main(String[] args) {
-        System.out.println(getHandlerSuperClasses(Ji2HandlerImpl.class));
-    }
+
+
 }
