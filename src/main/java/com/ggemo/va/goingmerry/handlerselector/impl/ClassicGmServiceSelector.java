@@ -33,7 +33,7 @@ public class ClassicGmServiceSelector
     ClassicConditionAnalyzer conditionAnalyzer;
 
     @Autowired
-    ClassicGmServiceRegistry handlerRegistry;
+    ClassicGmServiceRegistry gmServiceRegistry;
 
     @PostConstruct
     public void init() {
@@ -42,12 +42,12 @@ public class ClassicGmServiceSelector
         CacheStepUtil<ClassicGmServiceSelector.Context<ClassicConditionAnalyseResult>, Object,
                 GmService<?>> cacheStepUtil = new CacheStepUtil<>(
                 Context::getMmCondition,
-                Context::getResHandler,
+                Context::getResGmService,
                 (c, res) -> {
                     if (res == null) {
                         return;
                     }
-                    c.setResHandler(res);
+                    c.setResGmService(res);
                     c.setEarlyReturn(true);
                 });
 
@@ -63,9 +63,9 @@ public class ClassicGmServiceSelector
 
         // 根据解析结果找到匹配的OpHandler
         addStep(new ClassicOpStep<>(
-                handlerRegistry,
-                c -> new ClassicGmServiceRegistry.Req(c.getMmHandlerClazz(), c.getAnalyseResult()),
-                Context::setResHandler
+                gmServiceRegistry,
+                c -> new ClassicGmServiceRegistry.Req(c.getMmGmServiceClazz(), c.getAnalyseResult()),
+                Context::setResGmService
         ));
 
         // 写入缓存
@@ -75,14 +75,14 @@ public class ClassicGmServiceSelector
     @Override
     protected Context<ClassicConditionAnalyseResult> generateContext(Req req) {
         Context<ClassicConditionAnalyseResult> context = new Context<>();
-        context.setMmHandlerClazz(req.getHandlerClazz());
+        context.setMmGmServiceClazz(req.getGmServiceClazz());
         context.setMmCondition(req.getMmCondition());
         return context;
     }
 
     @Override
     protected GmService<?> castToRes(Context context) {
-        return context.getResHandler();
+        return context.getResGmService();
     }
 
     @Override
@@ -90,19 +90,19 @@ public class ClassicGmServiceSelector
             Class<S> handlerClazz, Condition mmCondition) {
         Req req = new Req();
         req.setMmCondition(mmCondition);
-        req.setHandlerClazz(handlerClazz);
+        req.setGmServiceClazz(handlerClazz);
         return (S) handle(req);
     }
 
     @Data
     @NoArgsConstructor
     public static class Context<AnalyseResult extends ConditionAnalyseResult> implements OpRichContext {
-        Class<? extends GmService<?>> mmHandlerClazz;
+        Class<? extends GmService<?>> mmGmServiceClazz;
         Object mmCondition;
 
         AnalyseResult analyseResult;
 
-        GmService<?> resHandler;
+        GmService<?> resGmService;
 
         boolean earlyReturn = false;
 
@@ -115,7 +115,7 @@ public class ClassicGmServiceSelector
     @Data
     @NoArgsConstructor
     static class Req {
-        Class<? extends GmService<?>> handlerClazz;
+        Class<? extends GmService<?>> gmServiceClazz;
         Object mmCondition;
     }
 }

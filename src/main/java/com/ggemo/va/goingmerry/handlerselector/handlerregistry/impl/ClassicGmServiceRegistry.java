@@ -18,7 +18,7 @@ import org.springframework.util.CollectionUtils;
 import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.handlerselector.handleranalyse.impl.ClassicConditionAnalyzer;
-import com.ggemo.va.goingmerry.handlerselector.handlerregistry.HandlerRegistry;
+import com.ggemo.va.goingmerry.handlerselector.handlerregistry.GmServiceRegistry;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 import com.ggemo.va.handler.OpHandler;
 
@@ -26,14 +26,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * <p>{@link HandlerRegistry}的classic实现
+ * <p>{@link GmServiceRegistry}的classic实现
  */
 @Component
-public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditionAnalyseResult>,
+public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicConditionAnalyseResult>,
         OpHandler<ClassicGmServiceRegistry.Req, GmService<?>> {
     // 存放handler的map, 取handler的时候按handlerClazz取, 根据analyseResult找权重最高的handler取
     private static final Map<Class<?>, Map<GmService<?>, List<ClassicConditionAnalyseResult>>>
-            GG_HANDLERS_HOLDER = new HashMap<>();
+            GG_GM_SERVICE_HOLDER = new HashMap<>();
 
     @Autowired
     private ClassicConditionAnalyzer analyzer;
@@ -43,20 +43,20 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
     }
 
     @Override
-    public <S extends GmService<?>> S findHandler(ClassicConditionAnalyseResult mmAnalyseResult,
-                                       Class<S> handlerClazz) {
+    public <S extends GmService<?>> S findService(ClassicConditionAnalyseResult mmAnalyseResult,
+                                                  Class<S> serviceClazz) {
         // 存放匹配的handler. key: handler, value: 命中的special条件数
-        Map<GmService<?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedHandlers = new HashMap<>();
+        Map<GmService<?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedServices = new HashMap<>();
 
-        if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
+        if (!GG_GM_SERVICE_HOLDER.containsKey(serviceClazz)) {
             // todo: no handler matches
             return null;
         }
 
         // 遍历handler和它的ggAnalyseResults
-        GG_HANDLERS_HOLDER.get(handlerClazz).forEach((handler, ggAnalyseResults) -> {
+        GG_GM_SERVICE_HOLDER.get(serviceClazz).forEach((service, ggAnalyseResults) -> {
             Map<ClassicConditionAnalyseResult, AtomicInteger> analyseResult2WeightMap = new HashMap<>();
-            matchedHandlers.put(handler, analyseResult2WeightMap);
+            matchedServices.put(service, analyseResult2WeightMap);
 
             // 遍历ggAnalyseResults, 对每个ggAnalyseResult和mmAnalyseResult相比较
             ggAnalyseResultsLoop:
@@ -94,10 +94,10 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
         List<GmService<?>> mostMatchedHandlers = new ArrayList<>();
 
         // 遍历handler
-        for (GmService<?> matchedHandler : matchedHandlers.keySet()) {
+        for (GmService<?> matchedHandler : matchedServices.keySet()) {
 
             // 该handler下的最高权重
-            OptionalInt matchedWeightOptional = matchedHandlers.get(matchedHandler)
+            OptionalInt matchedWeightOptional = matchedServices.get(matchedHandler)
                     .values()
                     .stream()
                     .mapToInt(AtomicInteger::get)
@@ -146,17 +146,17 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
     @Override
     public void register(ClassicConditionAnalyseResult analyseResult, GmService<?> service) {
         // 注册一个handler要将其所有父类注册上去
-        Set<Class<?>> registerClasses = getServerSuperClasses(service.getClass());
-        for (Class<?> handlerClazz : registerClasses) {
+        Set<Class<?>> registerClasses = getServiceSuperClasses(service.getClass());
+        for (Class<?> serviceClazz : registerClasses) {
 
             // 将analyseResult, handler放进map中
-            if (!GG_HANDLERS_HOLDER.containsKey(handlerClazz)) {
-                GG_HANDLERS_HOLDER.put(handlerClazz, new HashMap<>());
+            if (!GG_GM_SERVICE_HOLDER.containsKey(serviceClazz)) {
+                GG_GM_SERVICE_HOLDER.put(serviceClazz, new HashMap<>());
             }
-            if(!GG_HANDLERS_HOLDER.get(handlerClazz).containsKey(service)) {
-                GG_HANDLERS_HOLDER.get(handlerClazz).put(service, new ArrayList<>());
+            if(!GG_GM_SERVICE_HOLDER.get(serviceClazz).containsKey(service)) {
+                GG_GM_SERVICE_HOLDER.get(serviceClazz).put(service, new ArrayList<>());
             }
-            GG_HANDLERS_HOLDER.get(handlerClazz).get(service).add(analyseResult);
+            GG_GM_SERVICE_HOLDER.get(serviceClazz).get(service).add(analyseResult);
         }
     }
     /**
@@ -164,7 +164,7 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
      */
     @Override
     public GmService<?> handle(Req req) {
-        return this.findHandler(req.getAnalyseResult(), req.getMmServiceClazz());
+        return this.findService(req.getAnalyseResult(), req.getMmServiceClazz());
     }
 
     @Data
@@ -179,7 +179,7 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
      * @param clazz 给定类
      * @return 所有父类和所有接口
      */
-    private static Set<Class<?>> getServerSuperClasses(Class<?> clazz) {
+    private static Set<Class<?>> getServiceSuperClasses(Class<?> clazz) {
         Set<Class<?>> res = new HashSet<>();
 
         // 递归的出口
@@ -194,7 +194,7 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
         // 遍历所有上面一层的类和接口
         for (Class<?> superClazzes : getInterfacesAndSuperClass(clazz)) {
             // 递归地获取其所有继承自OpHandler的接口和父类
-            Set<Class<?>> superRes = getServerSuperClasses(superClazzes);
+            Set<Class<?>> superRes = getServiceSuperClasses(superClazzes);
             if (CollectionUtils.isEmpty(superRes)) {
                 continue;
             }
@@ -210,7 +210,7 @@ public class ClassicGmServiceRegistry implements HandlerRegistry<ClassicConditio
 
     /**
      * <p>工具方法, 找到给定类的接口和父类(一层)
-     * @see #getServerSuperClasses
+     * @see #getServiceSuperClasses
      */
     private static Set<Class<?>> getInterfacesAndSuperClass(Class<?> clazz) {
         Set<Class<?>> set = new HashSet<>(Arrays.asList(clazz.getInterfaces()));
