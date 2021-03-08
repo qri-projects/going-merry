@@ -6,7 +6,7 @@ import com.ggemo.va.handler.OpHandler;
 import com.ggemo.va.step.BaseOpStep;
 
 /**
- * <p>GmStep相关设计见docs/gm-step-design.md
+ * <p>GmStep相关设计见docs/gm-design.md
  */
 public abstract class GmStep<Context, Condition, Req, Res>
         extends BaseOpStep<Context, Req, Res> {

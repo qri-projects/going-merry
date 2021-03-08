@@ -4,7 +4,7 @@ import com.ggemo.va.goingmerry.gmservice.GmHandlerService;
 import com.ggemo.va.goingmerry.gmserviceselector.GmServiceSelector;
 
 /**
- * <p>GmStep相关设计见docs/gm-step-design.md
+ * <p>GmStep相关设计见docs/gm-design.md
  */
 public abstract class GmserviceSelectorBasedGmStep<Context, Condition, Req, Res>
         extends GmStep<Context, Condition, Req, Res>{

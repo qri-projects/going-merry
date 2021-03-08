@@ -8,7 +8,7 @@ import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 
 /**
- * <p>GmStep相关设计见docs/gm-step-design.md
+ * <p>GmStep相关设计见docs/gm-design.md
  */
 public class ClassicGmStep<Context, Condition, Req, Res> extends
         GmserviceSelectorBasedGmStep<Context, Condition, Req, Res> {
