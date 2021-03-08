@@ -10,7 +10,7 @@ import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.ConditionAnal
 public interface GmServiceRegistry<AnalyseResult extends ConditionAnalyseResult> {
     void initRegister();
 
-    void register(AnalyseResult analyseResult, GmService<?> service);
+    void register(GmService<?> service, String beanName);
 
     <S extends GmService<?>> S findService(AnalyseResult analyseResult, Class<S> serviceClazz);
 }

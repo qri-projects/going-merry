@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.ggemo.va.goingmerry.exception.SelectServiceException;
 import com.ggemo.va.goingmerry.gmservice.GmService;
 import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyseResult;
 import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyzer;
@@ -35,6 +37,8 @@ public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicCondit
     private static final Map<Class<?>, Map<GmService<?>, List<ClassicConditionAnalyseResult>>>
             GG_GM_SERVICE_HOLDER = new HashMap<>();
 
+    private static final Map<GmService<?>, String> GG_GM_SERVICE_2_NAME = new HashMap<>();
+
     @Autowired
     private ClassicConditionAnalyzer analyzer;
 
@@ -49,8 +53,8 @@ public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicCondit
         Map<GmService<?>, Map<ClassicConditionAnalyseResult, AtomicInteger>> matchedServices = new HashMap<>();
 
         if (!GG_GM_SERVICE_HOLDER.containsKey(serviceClazz)) {
-            // todo: no gmService matches
-            return null;
+            throw new SelectServiceException("No matched service of this class! Confirm that you have defined a "
+                    + "service that implements class: " + serviceClazz.getName() + ".");
         }
 
         // 遍历gmService和它的ggAnalyseResults
@@ -119,46 +123,54 @@ public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicCondit
         }
 
         if (CollectionUtils.isEmpty(mostMatchedGmServices)) {
-            throw new RuntimeException("// todo: 没有匹配的gmService");
+            throw new SelectServiceException("No matched service about your condition: " + mmAnalyseResult);
         }
 
         if (mostMatchedGmServices.size() > 1) {
-            throw new RuntimeException("// todo: 匹配冲突, 有两个gmService匹配到");
+            List<String> matchedBeanNames = mostMatchedGmServices.stream()
+                    .map(GG_GM_SERVICE_2_NAME::get)
+                    .collect(Collectors.toList());
+            throw new SelectServiceException("Not only one gmService matched your condition. Matched beans: "
+                    + matchedBeanNames);
         }
-        return (S)mostMatchedGmServices.get(0);
+        
+        return (S) mostMatchedGmServices.get(0);
     }
 
     @Override
     public void initRegister() {
         ApplicationContext appC = getApplicationContext();
         for (String beanName : appC.getBeanNamesForType(GmService.class)) {
-            GmService<?> bean = appC.getBean(beanName, GmService.class);
-            bean.getConditions().forEach(c -> {
-                // 解析ggCondition
-                ClassicConditionAnalyseResult result = analyzer.analyse(c);
-
-                // 注册
-                register(result, bean);
-            });
+            GmService<?> service = appC.getBean(beanName, GmService.class);
+            register(service, beanName);
         }
     }
 
     @Override
-    public void register(ClassicConditionAnalyseResult analyseResult, GmService<?> service) {
-        // 注册一个gmService要将其所有父类注册上去
-        Set<Class<?>> registerClasses = getServiceSuperClasses(service.getClass());
-        for (Class<?> serviceClazz : registerClasses) {
+    public void register(GmService<?> service, String beanName) {
+        // 记录service和bean名字的对应关系
+        GG_GM_SERVICE_2_NAME.put(service, beanName);
 
-            // 将analyseResult, gmService放进map中
-            if (!GG_GM_SERVICE_HOLDER.containsKey(serviceClazz)) {
-                GG_GM_SERVICE_HOLDER.put(serviceClazz, new HashMap<>());
+        service.getConditions().forEach(c -> {
+            // 解析ggCondition
+            ClassicConditionAnalyseResult analyseResult = analyzer.analyse(c);
+
+            // 注册一个gmService要将其所有父类注册上去
+            Set<Class<?>> registerClasses = getServiceSuperClasses(service.getClass());
+            for (Class<?> serviceClazz : registerClasses) {
+
+                // 将analyseResult, gmService放进map中
+                if (!GG_GM_SERVICE_HOLDER.containsKey(serviceClazz)) {
+                    GG_GM_SERVICE_HOLDER.put(serviceClazz, new HashMap<>());
+                }
+                if (!GG_GM_SERVICE_HOLDER.get(serviceClazz).containsKey(service)) {
+                    GG_GM_SERVICE_HOLDER.get(serviceClazz).put(service, new ArrayList<>());
+                }
+                GG_GM_SERVICE_HOLDER.get(serviceClazz).get(service).add(analyseResult);
             }
-            if(!GG_GM_SERVICE_HOLDER.get(serviceClazz).containsKey(service)) {
-                GG_GM_SERVICE_HOLDER.get(serviceClazz).put(service, new ArrayList<>());
-            }
-            GG_GM_SERVICE_HOLDER.get(serviceClazz).get(service).add(analyseResult);
-        }
+        });
     }
+
     /**
      * <p>作为handler提供的方法
      */
@@ -176,6 +188,7 @@ public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicCondit
 
     /**
      * <p>工具方法, 找到给定类的所有继承自{@link GmService}的接口和父类
+     *
      * @param clazz 给定类
      * @return 所有父类和所有接口
      */
@@ -210,6 +223,7 @@ public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicCondit
 
     /**
      * <p>工具方法, 找到给定类的接口和父类(一层)
+     *
      * @see #getServiceSuperClasses
      */
     private static Set<Class<?>> getInterfacesAndSuperClass(Class<?> clazz) {
