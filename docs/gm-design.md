@@ -5,7 +5,9 @@
 
 ## 设计中的问题
 ### 如何传递策略使用的condition?
-going-merry选择 显式地将condition作为selectService方法的参数传递  
+going-merry有提供了两种思路:  
+- 显式地将condition作为selectService方法的参数传递  
+- ```FlexConditionGmServiceSelector```接口提供了另一种思路, 灵活地设置和取用condition
 
 ### condition的匹配规则
 condition的类型不同 匹配方式不同  

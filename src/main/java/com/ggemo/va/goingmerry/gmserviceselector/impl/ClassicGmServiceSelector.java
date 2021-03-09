@@ -3,6 +3,7 @@ package com.ggemo.va.goingmerry.gmserviceselector.impl;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.ggemo.va.business.pipeline.RichListPplBusiness;
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
  * 使用责任链的方式理清逻辑
  */
 @Component
+@Primary
 public class ClassicGmServiceSelector
         extends RichListPplBusiness<ClassicGmServiceSelector.Context<ClassicConditionAnalyseResult>,
         ClassicGmServiceSelector.Req, GmService<?>>
