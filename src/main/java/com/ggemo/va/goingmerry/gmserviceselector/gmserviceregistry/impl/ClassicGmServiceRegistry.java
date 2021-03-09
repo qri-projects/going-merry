@@ -133,7 +133,7 @@ public class ClassicGmServiceRegistry implements GmServiceRegistry<ClassicCondit
             throw new SelectServiceException("Not only one gmService matched your condition. Matched beans: "
                     + matchedBeanNames);
         }
-        
+
         return (S) mostMatchedGmServices.get(0);
     }
 

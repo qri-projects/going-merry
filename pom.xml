@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ggemo.va</groupId>
     <artifactId>going-merry</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <name>going-merry</name>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.ggemo.va</groupId>
             <artifactId>one-piece</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <!-- spring -->
@@ -47,11 +47,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.11</version>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>

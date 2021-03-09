@@ -39,7 +39,6 @@ public class ClassicConditionAnalyzer
         // map
         if (condition instanceof Map) {
             Map<?, ?> conditionMap = (Map<?, ?>) condition;
-            conditionMap.forEach((field, value) -> result.put(field.toString(), value));
             result.putAll(conditionMap);
             return result;
         }
@@ -66,6 +65,7 @@ public class ClassicConditionAnalyzer
         Field[] fields = conditionClazz.getDeclaredFields();
 
         for (Field field : fields) {
+            field.setAccessible(true);
             String fieldName = field.getName();
             try {
                 result.put(fieldName, field.get(condition));

@@ -29,14 +29,19 @@ public class ClassicGmServiceSelector
         ClassicGmServiceSelector.Req, GmService<?>>
         implements GmServiceSelector {
 
+    @PostConstruct
+    public void init() {
+        super.init();
+    }
+
     @Autowired
     ClassicConditionAnalyzer conditionAnalyzer;
 
     @Autowired
     ClassicGmServiceRegistry gmServiceRegistry;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void initSteps() {
         // 初始化缓存工具, 方便从缓存取结果
         // 一个condition如果没有缓存的话, 要经过下面那些步骤(解析condition, 匹配解析结果等)才能拿到实现类
         CacheStepUtil<ClassicGmServiceSelector.Context<ClassicConditionAnalyseResult>, Object,
