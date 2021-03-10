@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.gmservice;
+package com.ggemo.va.goingmerry.annotation;
 
 import com.ggemo.va.handler.OpHandler;
 

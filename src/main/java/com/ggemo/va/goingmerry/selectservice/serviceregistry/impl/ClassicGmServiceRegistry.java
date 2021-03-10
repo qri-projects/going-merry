@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.gmserviceselector.gmserviceregistry.impl;
+package com.ggemo.va.goingmerry.selectservice.serviceregistry.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.ggemo.va.goingmerry.exception.SelectServiceException;
-import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyseResult;
-import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyzer;
-import com.ggemo.va.goingmerry.gmserviceselector.gmserviceregistry.GmServiceRegistry;
+import com.ggemo.va.goingmerry.annotation.GmService;
+import com.ggemo.va.goingmerry.selectservice.conditionanalyzer.impl.ClassicConditionAnalyseResult;
+import com.ggemo.va.goingmerry.selectservice.conditionanalyzer.impl.ClassicConditionAnalyzer;
+import com.ggemo.va.goingmerry.selectservice.serviceregistry.GmServiceRegistry;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 import com.ggemo.va.handler.OpHandler;
 

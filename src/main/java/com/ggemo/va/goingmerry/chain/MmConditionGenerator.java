@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.op.step;
+package com.ggemo.va.goingmerry.chain;
 
 /**
  * <p>GmStep相关设计见docs/gm-design.md

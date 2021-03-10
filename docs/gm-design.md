@@ -4,12 +4,12 @@
 设计图源文件(下载后draw.io打开): [OneDrive链接](https://1drv.ms/u/s!AvbOqvo5jCvum3_EWuG1-e4GFQnj?e=AnybjO)  
 
 ## 设计中的问题
-### 如何传递策略使用的condition?
+### 策略: 如何传递策略使用的condition?
 going-merry有提供了两种思路:  
 - 显式地将condition作为selectService方法的参数传递  
 - ```FlexConditionGmServiceSelector```接口提供了另一种思路, 灵活地设置和取用condition
 
-### condition的匹配规则
+### 策略: condition的匹配规则
 condition的类型不同 匹配方式不同  
 
 - 枚举  

@@ -1,8 +1,8 @@
-package com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl;
+package com.ggemo.va.goingmerry.selectservice.conditionanalyzer.impl;
 
 import java.util.HashMap;
 
-import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.ConditionAnalyseResult;
+import com.ggemo.va.goingmerry.selectservice.conditionanalyzer.ConditionAnalyseResult;
 
 import lombok.Getter;
 import lombok.Setter;

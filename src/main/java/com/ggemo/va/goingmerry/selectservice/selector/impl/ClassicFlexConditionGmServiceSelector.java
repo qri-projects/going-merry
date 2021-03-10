@@ -1,8 +1,8 @@
-package com.ggemo.va.goingmerry.gmserviceselector.impl;
+package com.ggemo.va.goingmerry.selectservice.selector.impl;
 
 import org.springframework.stereotype.Component;
 
-import com.ggemo.va.goingmerry.gmserviceselector.FlexConditionGmServiceSelector;
+import com.ggemo.va.goingmerry.selectservice.selector.FlexConditionGmServiceSelector;
 
 @Component
 public class ClassicFlexConditionGmServiceSelector extends ClassicGmServiceSelector implements

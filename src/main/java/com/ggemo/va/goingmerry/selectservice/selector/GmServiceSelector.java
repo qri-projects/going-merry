@@ -1,7 +1,7 @@
-package com.ggemo.va.goingmerry.gmserviceselector;
+package com.ggemo.va.goingmerry.selectservice.selector;
 
-import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.gmserviceselector.impl.ClassicGmServiceSelector;
+import com.ggemo.va.goingmerry.annotation.GmService;
+import com.ggemo.va.goingmerry.selectservice.selector.impl.ClassicGmServiceSelector;
 
 /**
  * <p>根据条件找实现类的接口

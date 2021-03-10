@@ -1,4 +1,4 @@
-package com.ggemo.va.goingmerry.gmserviceselector.impl;
+package com.ggemo.va.goingmerry.selectservice.selector.impl;
 
 import javax.annotation.PostConstruct;
 
@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.ggemo.va.business.pipeline.RichListPplBusiness;
-import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.gmserviceselector.GmServiceSelector;
-import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.ConditionAnalyseResult;
-import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyseResult;
-import com.ggemo.va.goingmerry.gmserviceselector.conditionanalyzer.impl.ClassicConditionAnalyzer;
-import com.ggemo.va.goingmerry.gmserviceselector.gmserviceregistry.impl.ClassicGmServiceRegistry;
+import com.ggemo.va.goingmerry.annotation.GmService;
+import com.ggemo.va.goingmerry.selectservice.selector.GmServiceSelector;
+import com.ggemo.va.goingmerry.selectservice.conditionanalyzer.ConditionAnalyseResult;
+import com.ggemo.va.goingmerry.selectservice.conditionanalyzer.impl.ClassicConditionAnalyseResult;
+import com.ggemo.va.goingmerry.selectservice.conditionanalyzer.impl.ClassicConditionAnalyzer;
+import com.ggemo.va.goingmerry.selectservice.serviceregistry.impl.ClassicGmServiceRegistry;
 import com.ggemo.va.opentity.OpRichContext;
 import com.ggemo.va.step.ClassicOpStep;
 import com.ggemo.va.step.useutils.CacheStepUtil;

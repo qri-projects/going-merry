@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import com.ggemo.va.goingmerry.gmservice.GmService;
-import com.ggemo.va.goingmerry.gmserviceselector.gmserviceregistry.GmServiceRegistry;
+import com.ggemo.va.goingmerry.annotation.GmService;
+import com.ggemo.va.goingmerry.selectservice.serviceregistry.GmServiceRegistry;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 
 import lombok.extern.slf4j.Slf4j;

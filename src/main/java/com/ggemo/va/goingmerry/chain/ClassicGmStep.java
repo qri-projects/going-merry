@@ -1,10 +1,9 @@
-package com.ggemo.va.goingmerry.op;
+package com.ggemo.va.goingmerry.chain;
 
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
-import com.ggemo.va.goingmerry.gmservice.GmHandlerService;
-import com.ggemo.va.goingmerry.gmserviceselector.GmServiceSelector;
-import com.ggemo.va.goingmerry.op.step.MmConditionGenerator;
+import com.ggemo.va.goingmerry.annotation.GmHandlerService;
+import com.ggemo.va.goingmerry.selectservice.selector.GmServiceSelector;
 import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
 
 /**
