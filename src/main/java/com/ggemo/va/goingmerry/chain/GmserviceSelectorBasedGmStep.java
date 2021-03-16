@@ -1,7 +1,7 @@
 package com.ggemo.va.goingmerry.chain;
 
-import com.ggemo.va.goingmerry.annotation.GmHandlerService;
-import com.ggemo.va.goingmerry.selectservice.selector.GmServiceSelector;
+import com.ggemo.va.goingmerry.service.base.GmHandlerService;
+import com.ggemo.va.goingmerry.service.selectservice.selector.GmServiceSelector;
 
 /**
  * <p>GmStep相关设计见docs/gm-design.md

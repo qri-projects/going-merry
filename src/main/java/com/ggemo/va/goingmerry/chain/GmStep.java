@@ -1,6 +1,6 @@
 package com.ggemo.va.goingmerry.chain;
 
-import com.ggemo.va.goingmerry.annotation.GmHandlerService;
+import com.ggemo.va.goingmerry.service.base.GmHandlerService;
 import com.ggemo.va.step.BaseOpStep;
 
 /**

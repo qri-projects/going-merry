@@ -2,22 +2,22 @@ package com.ggemo.va.goingmerry.chain;
 
 import com.ggemo.va.contextadaptor.step.StepReqGenerator;
 import com.ggemo.va.contextadaptor.step.StepResApplier;
-import com.ggemo.va.goingmerry.annotation.GmHandlerService;
-import com.ggemo.va.goingmerry.selectservice.selector.GmServiceSelector;
-import com.ggemo.va.goingmerry.utiils.ApplicationContextUtil;
+import com.ggemo.va.goingmerry.service.base.GmHandlerService;
+import com.ggemo.va.goingmerry.service.selectservice.selector.GmServiceSelector;
+import com.ggemo.va.goingmerry.utils.ApplicationContextUtil;
 
 /**
  * <p>GmStep相关设计见docs/gm-design.md
  */
 public class ClassicGmStep<Context, Condition, Req, Res> extends
         GmserviceSelectorBasedGmStep<Context, Condition, Req, Res> {
-    private MmConditionGenerator<Condition, Context> mmConditionGenerator;
+    private ChainMmConditionGenerator<Condition, Context> mmConditionGenerator;
     private StepReqGenerator<Req, Context> reqGenerator;
     private StepResApplier<Context, Res> resApplier;
     private GmServiceSelector gmServiceSelector;
 
     public ClassicGmStep(Class<? extends GmHandlerService<Condition, Req, Res>> handlerClass,
-                         MmConditionGenerator<Condition, Context> mmConditionGenerator,
+                         ChainMmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier) {
         this.handlerClazz = handlerClass;
@@ -28,7 +28,7 @@ public class ClassicGmStep<Context, Condition, Req, Res> extends
     }
 
     public ClassicGmStep(Class<? extends GmHandlerService<Condition, Req, Res>> handlerClass,
-                         MmConditionGenerator<Condition, Context> mmConditionGenerator,
+                         ChainMmConditionGenerator<Condition, Context> mmConditionGenerator,
                          StepReqGenerator<Req, Context> reqGenerator,
                          StepResApplier<Context, Res> resApplier,
                          GmServiceSelector gmServiceSelector) {

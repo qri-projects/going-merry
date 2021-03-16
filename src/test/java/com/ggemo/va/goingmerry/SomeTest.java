@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.ggemo.va.goingmerry.utils.SuperClassUtils;
 import com.ggemo.va.handler.OpHandler;
 
 public class SomeTest {
@@ -28,48 +29,15 @@ public class SomeTest {
         }
     }
 
-    static class Ji2HandlerImpl extends JjHandlerImpl {
+    static class Ji2HandlerImpl extends JjHandlerImpl implements XXX {
 
     }
 
-    static Set<Class> getSuperClasses(Class clazz) {
-        Set<Class> res = new HashSet<>();
-
-
-        while (Arrays.asList(clazz.getInterfaces()).contains(OpHandler.class)) {
-            res.add(clazz);
-            clazz = clazz.getSuperclass();
-        }
-        return res;
+    public static void main(String[] args) {
+        System.out.println(SuperClassUtils.getAllSupers(Ji2HandlerImpl.class));
     }
 
-    static Set<Class> getInterfacesAndSuperClass(Class clazz) {
-        Set<Class> set = new HashSet<>();
-        set.addAll(Arrays.asList(clazz.getInterfaces()));
-        set.add(clazz.getSuperclass());
-        return set;
-    }
 
-    static Set<Class> getHandlerSuperClasses(Class clazz) {
-        if (clazz == null) {
-            return new HashSet<>();
-        }
-        if (clazz.equals(OpHandler.class)) {
-            return new HashSet<Class>(){{add(OpHandler.class);}};
-        }
-        Set<Class> res = new HashSet<>();
-        for (Class interfaze : getInterfacesAndSuperClass(clazz)) {
-            Set<Class> interfazeRes = getHandlerSuperClasses(interfaze);
-            if (interfazeRes.size() == 0) {
-                continue;
-            }
-            res.addAll(getHandlerSuperClasses(interfaze));
-        }
-        if (res.size() != 0) {
-            res.add(clazz);
-        }
-        return res;
-    }
 
 
 
