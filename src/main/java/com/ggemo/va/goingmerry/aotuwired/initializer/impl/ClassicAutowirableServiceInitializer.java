@@ -14,6 +14,7 @@ import com.ggemo.va.goingmerry.utils.ApplicationContextUtil;
 import com.ggemo.va.goingmerry.utils.BeanNameUtils;
 import com.ggemo.va.goingmerry.utils.SuperClassUtils;
 
+
 @Component
 public class ClassicAutowirableServiceInitializer implements AutowirableServiceInitializer {
     @Override
@@ -22,9 +23,12 @@ public class ClassicAutowirableServiceInitializer implements AutowirableServiceI
         DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) appC.getAutowireCapableBeanFactory();
         AutowiredGmServiceProxyBuilder proxyBeanBuilder = appC.getBean(AutowiredGmServiceProxyBuilder.class);
 
+        // 获取{@link GmService}的所有bean
         appC.getBeansOfType(GmService.class)
                 .values()
                 .stream()
+
+                // 获得所有{@link GmService}的bean实现的接口, 找出被{@link GmAutowirable}注解的接口
                 .flatMap(
                         b -> SuperClassUtils.getServiceSuperClassesUntil(b.getClass(), GmService.class)
                                 .stream()
@@ -33,6 +37,8 @@ public class ClassicAutowirableServiceInitializer implements AutowirableServiceI
                                 .map(c -> (Class<GmService>) c)
                 )
                 .distinct()
+
+                // 构建代理bean, 塞到spring里
                 .forEach(i -> {
                     GmService<?> proxyBean = proxyBeanBuilder.build(i);
 
@@ -40,6 +46,7 @@ public class ClassicAutowirableServiceInitializer implements AutowirableServiceI
 
                     BeanDefinition beanDefinition = BeanDefinitionBuilder
                             .genericBeanDefinition(i, () -> proxyBean)
+                            // 代理bean是primary的
                             .setPrimary(true)
                             .getBeanDefinition();
                     beanFactory.registerBeanDefinition(beanName, beanDefinition);
