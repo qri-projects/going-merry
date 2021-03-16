@@ -12,12 +12,8 @@ import org.springframework.core.annotation.AliasFor;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface GmAutowirable {
-    @AliasFor("conditionGenerator")
-    String value();
-
     /**
-     * conditionGenerator的beanName
+     * conditionGenerator 的 beanName
      */
-    @AliasFor("value")
-    String conditionGenerator();
+    String value() default "";
 }

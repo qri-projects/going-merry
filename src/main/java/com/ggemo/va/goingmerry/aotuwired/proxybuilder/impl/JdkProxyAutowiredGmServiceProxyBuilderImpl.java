@@ -39,7 +39,7 @@ public class JdkProxyAutowiredGmServiceProxyBuilderImpl implements AutowiredGmSe
         GmAutowirable gmAutowirable = serviceClazz.getAnnotation(GmAutowirable.class);
 
         MmConditionGenerator<Con> conditionGenerator =
-                (MmConditionGenerator<Con>) ApplicationContextUtil.getApplicationContext().getBean(gmAutowirable.conditionGenerator());
+                (MmConditionGenerator<Con>) ApplicationContextUtil.getApplicationContext().getBean(gmAutowirable.value());
 
 
         Object proxyBean = Proxy.newProxyInstance(serviceClazz.getClassLoader(), serverClazzesArray,
